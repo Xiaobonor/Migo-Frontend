@@ -1,0 +1,78 @@
+// Tab Bar
+"tab.focus" = "Focus";
+"tab.diary" = "Diary";
+"tab.group" = "Group";
+"tab.goals" = "Goals";
+"tab.profile" = "Profile";
+
+// Focus View
+"focus.title" = "Focus";
+"focus.start" = "Start Focus";
+"focus.pause" = "Pause";
+"focus.reset" = "Reset";
+"focus.join_group" = "Join Group";
+
+// Diary View
+"diary.title" = "Diary";
+"diary.quick_note" = "Quick Note";
+"diary.new_diary" = "New Diary";
+"diary.mood" = "Today's Mood";
+"diary.search" = "Search diary...";
+
+// Group View
+"group.title" = "Group";
+"group.my_groups" = "My Groups";
+"group.explore" = "Explore";
+"group.create" = "Create Group";
+"group.join" = "Join";
+"group.active" = "Active Groups";
+"group.recommended" = "Recommended";
+"group.new" = "New Groups";
+
+// Goals View
+"goals.title" = "Goals";
+"goals.in_progress" = "In Progress";
+"goals.completed" = "Completed";
+"goals.all" = "All";
+"goals.new" = "New Goal";
+"goals.weekly_progress" = "Weekly Progress";
+
+// Profile View
+"profile.title" = "Profile";
+"profile.settings" = "Settings";
+"profile.achievements" = "Achievements";
+"profile.data" = "Data Report";
+"profile.learning" = "Learning History";
+"profile.privacy" = "Privacy Settings";
+"profile.help" = "Help & Feedback";
+"profile.username" = "Yang Zhihan";
+"profile.signature" = "Stay focused, keep growing";
+"profile.streak" = "7 Days Streak";
+"profile.monthly_stats" = "Monthly Stats";
+"profile.focus_hours" = "Focus Hours";
+"profile.completed_goals" = "Completed Goals";
+"profile.writing_days" = "Writing Days";
+
+// Settings
+"settings.title" = "Settings";
+"settings.dark_mode" = "Dark Mode";
+"settings.notifications" = "Enable Notifications";
+"settings.language" = "Language";
+"settings.version" = "Version";
+"settings.privacy_policy" = "Privacy Policy";
+"settings.terms" = "Terms of Service";
+"settings.logout" = "Logout";
+"settings.display" = "Display";
+"settings.enable_notifications" = "Enable Notifications";
+"settings.select_language" = "Select Language";
+"settings.language_changed" = "Language Changed";
+"settings.restart_required" = "Please restart the app to apply the new language settings";
+
+// Common
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.done" = "Done";
+"common.create" = "Create";
+"common.ok" = "OK"; 

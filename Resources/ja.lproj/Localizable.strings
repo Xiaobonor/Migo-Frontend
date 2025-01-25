@@ -1,0 +1,78 @@
+// Tab Bar
+"tab.focus" = "フォーカス";
+"tab.diary" = "日記";
+"tab.group" = "グループ";
+"tab.goals" = "目標";
+"tab.profile" = "プロフィール";
+
+// Focus View
+"focus.title" = "フォーカス";
+"focus.start" = "開始";
+"focus.pause" = "一時停止";
+"focus.reset" = "リセット";
+"focus.join_group" = "グループに参加";
+
+// Diary View
+"diary.title" = "日記";
+"diary.quick_note" = "クイックノート";
+"diary.new_diary" = "新規日記";
+"diary.mood" = "今日の気分";
+"diary.search" = "日記を検索...";
+
+// Group View
+"group.title" = "グループ";
+"group.my_groups" = "マイグループ";
+"group.explore" = "探索";
+"group.create" = "グループ作成";
+"group.join" = "参加";
+"group.active" = "アクティブグループ";
+"group.recommended" = "おすすめ";
+"group.new" = "新規グループ";
+
+// Goals View
+"goals.title" = "目標";
+"goals.in_progress" = "進行中";
+"goals.completed" = "完了";
+"goals.all" = "すべて";
+"goals.new" = "新規目標";
+"goals.weekly_progress" = "週間進捗";
+
+// Profile View
+"profile.title" = "プロフィール";
+"profile.settings" = "設定";
+"profile.achievements" = "実績";
+"profile.data" = "データレポート";
+"profile.learning" = "学習履歴";
+"profile.privacy" = "プライバシー設定";
+"profile.help" = "ヘルプとフィードバック";
+"profile.username" = "ヤン・ジーハン";
+"profile.signature" = "集中を保ち、成長を続ける";
+"profile.streak" = "7日連続達成";
+"profile.monthly_stats" = "今月の統計";
+"profile.focus_hours" = "集中時間";
+"profile.completed_goals" = "達成目標";
+"profile.writing_days" = "執筆日数";
+
+// Settings
+"settings.title" = "設定";
+"settings.dark_mode" = "ダークモード";
+"settings.notifications" = "通知を許可";
+"settings.language" = "言語";
+"settings.version" = "バージョン";
+"settings.privacy_policy" = "プライバシーポリシー";
+"settings.terms" = "利用規約";
+"settings.logout" = "ログアウト";
+"settings.display" = "表示";
+"settings.enable_notifications" = "通知を許可";
+"settings.select_language" = "言語を選択";
+"settings.language_changed" = "言語が変更されました";
+"settings.restart_required" = "新しい言語設定を適用するにはアプリを再起動してください";
+
+// Common
+"common.cancel" = "キャンセル";
+"common.save" = "保存";
+"common.delete" = "削除";
+"common.edit" = "編集";
+"common.done" = "完了";
+"common.create" = "作成";
+"common.ok" = "OK"; 

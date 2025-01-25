@@ -1,0 +1,79 @@
+// Tab Bar
+"tab.focus" = "專注";
+"tab.diary" = "日記";
+"tab.group" = "小組";
+"tab.goals" = "目標";
+"tab.profile" = "我的";
+
+// Focus View
+"focus.title" = "專注";
+"focus.start" = "開始專注";
+"focus.pause" = "暫停";
+"focus.reset" = "重置";
+"focus.join_group" = "加入小組";
+
+// Diary View
+"diary.title" = "日記";
+"diary.quick_note" = "隨手記";
+"diary.new_diary" = "新增日記";
+"diary.mood" = "今日心情";
+"diary.search" = "搜尋日記...";
+
+// Group View
+"group.title" = "小組";
+"group.my_groups" = "我的小組";
+"group.explore" = "探索";
+"group.create" = "創建小組";
+"group.join" = "加入";
+"group.active" = "活躍小組";
+"group.recommended" = "為你推薦";
+"group.new" = "最新小組";
+
+// Goals View
+"goals.title" = "目標";
+"goals.in_progress" = "進行中";
+"goals.completed" = "已完成";
+"goals.all" = "全部";
+"goals.new" = "新增目標";
+"goals.weekly_progress" = "本週進度";
+
+// Profile View
+"profile.title" = "我的";
+"profile.settings" = "設置";
+"profile.achievements" = "我的成就";
+"profile.data" = "數據報告";
+"profile.learning" = "學習歷程";
+"profile.privacy" = "隱私設置";
+"profile.help" = "幫助與反饋";
+"profile.username" = "楊芷涵";
+"profile.signature" = "保持專注，持續成長";
+"profile.streak" = "連續專注 7 天";
+"profile.monthly_stats" = "本月統計";
+"profile.focus_hours" = "專注小時";
+"profile.completed_goals" = "完成目標";
+"profile.writing_days" = "寫作天數";
+
+// Settings
+"settings.title" = "設置";
+"settings.dark_mode" = "深色模式";
+"settings.notifications" = "允許通知";
+"settings.language" = "語言";
+"settings.version" = "版本";
+"settings.privacy_policy" = "隱私政策";
+"settings.terms" = "服務條款";
+"settings.logout" = "登出";
+"settings.display" = "顯示";
+"settings.enable_notifications" = "允許通知";
+"settings.select_language" = "選擇語言";
+"settings.language_changed" = "語言已更改";
+"settings.restart_required" = "請重新啟動應用程序以套用新的語言設置";
+"settings.about" = "關於";
+
+// Common
+"common.cancel" = "取消";
+"common.save" = "儲存";
+"common.delete" = "刪除";
+"common.edit" = "編輯";
+"common.done" = "完成";
+"common.create" = "創建";
+"common.ok" = "確定"; 
