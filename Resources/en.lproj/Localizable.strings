@@ -12,15 +12,39 @@
 "focus.reset" = "Reset";
 "focus.join_group" = "Join Group";
 
+// Focus Status and Buttons
+"focus.status.focusing" = "Focusing";
+"focus.status.ready" = "Ready to Start";
+"focus.button.reset" = "Reset Timer";
+"focus.button.pause" = "Pause Timer";
+"focus.button.start" = "Start Timer";
+"focus.button.join_group" = "Join Group";
+
+// Focus Groups
+"focus.groups.my_groups" = "My Groups";
+"focus.groups.recommended" = "Recommended Groups";
+"focus.groups.select" = "Select Group";
+"focus.groups.study_group" = "Study Group";
+"focus.groups.members_focusing" = "3 Members Focusing";
+"focus.groups.join" = "Join";
+
 // Diary View
 "diary.title" = "Diary";
 "diary.quick_note" = "Quick Note";
 "diary.new_diary" = "New Diary";
 "diary.mood" = "Today's Mood";
 "diary.search" = "Search diary...";
+"diary.time_format" = "3:30 PM";
+"diary.location.library" = "Library";
+"diary.sample_note" = "Learned new concepts at the library today, feeling accomplished...";
+"diary.study_diary" = "Study Diary";
+"diary.sample_content" = "Today's study plan went well, despite some challenges...";
+"diary.tag.study" = "Study";
+"diary.tag.reflection" = "Reflection";
+"diary.title_placeholder" = "Enter title";
 
 // Group View
-"group.title" = "Group";
+"group.title" = "Groups";
 "group.my_groups" = "My Groups";
 "group.explore" = "Explore";
 "group.create" = "Create Group";
@@ -28,6 +52,32 @@
 "group.active" = "Active Groups";
 "group.recommended" = "Recommended";
 "group.new" = "New Groups";
+"group.all" = "All Groups";
+"group.search" = "Search groups...";
+"group.study_group" = "Study Group";
+"group.members_focusing" = "3 Members Focusing";
+"group.join_focus" = "Join Focus";
+"group.exam_prep" = "Exam Prep Group";
+"group.focus_duration" = "Today's Focus: %@";
+"group.english_study" = "English Study Group";
+"group.members_count" = "%d Members";
+"group.new_group_name" = "Programming Exchange";
+"group.new_group_description" = "Just Created";
+"group.popular_tags" = "Popular Tags";
+
+// Group Tags
+"group.tag.exam" = "Exam";
+"group.tag.english" = "English";
+"group.tag.programming" = "Programming";
+"group.tag.reading" = "Reading";
+"group.tag.writing" = "Writing";
+
+// Create Group Form
+"group.section.basic_info" = "Basic Information";
+"group.section.privacy" = "Privacy Settings";
+"group.section.tags" = "Tags";
+"group.name_placeholder" = "Group Name";
+"group.is_public" = "Public Group";
 
 // Goals View
 "goals.title" = "Goals";
@@ -36,6 +86,40 @@
 "goals.all" = "All";
 "goals.new" = "New Goal";
 "goals.weekly_progress" = "Weekly Progress";
+"goals.view_details" = "View Details";
+"goals.progress_format" = "%d%%";
+"goals.study_goal" = "Study Goal";
+"goals.days_remaining" = "%d Days Left";
+"goals.sample_goal" = "Complete SwiftUI Course";
+"goals.completion_percentage" = "%d%% Complete";
+
+// Goal Categories
+"goals.category.study" = "Study";
+"goals.category.exercise" = "Exercise";
+"goals.category.reading" = "Reading";
+"goals.category.writing" = "Writing";
+"goals.category.other" = "Other";
+
+// Goal Tags
+"goals.tag.programming" = "Programming";
+"goals.tag.english" = "English";
+"goals.tag.fitness" = "Fitness";
+"goals.tag.reading" = "Reading";
+"goals.tag.writing" = "Writing";
+"goals.tag.focus" = "Focus";
+"goals.tag.learning" = "Learning";
+
+// New Goal Form
+"goals.section.basic_info" = "Basic Information";
+"goals.section.category" = "Category";
+"goals.section.end_date" = "End Date";
+"goals.section.tags" = "Tags";
+"goals.section.reminders" = "Reminders";
+"goals.title_placeholder" = "Goal Title";
+"goals.select_category" = "Select Category";
+"goals.select_date" = "Select Date";
+"goals.daily_reminder" = "Daily Reminder";
+"goals.completion_reminder" = "Completion Reminder";
 
 // Profile View
 "profile.title" = "Profile";
@@ -68,6 +152,19 @@
 "settings.language_changed" = "Language Changed";
 "settings.restart_required" = "Please restart the app to apply the new language settings";
 
+// Settings Descriptions
+"settings.dark_mode.description" = "Dark mode provides a more comfortable reading experience at night";
+"settings.notifications.description" = "Receive important notifications to stay updated";
+"settings.language.description" = "Choose your preferred app language";
+
+// Version Info
+"settings.version_info" = "Version Info";
+"settings.build" = "Build";
+
+// Privacy and Terms
+"settings.privacy_policy.content" = "Privacy Policy content...";
+"settings.terms.content" = "Terms of Service content...";
+
 // Common
 "common.cancel" = "Cancel";
 "common.save" = "Save";
@@ -75,4 +172,9 @@
 "common.edit" = "Edit";
 "common.done" = "Done";
 "common.create" = "Create";
-"common.ok" = "OK"; 
+"common.ok" = "OK";
+
+// Language Names
+"language.zh_hant" = "Traditional Chinese";
+"language.en" = "English";
+"language.ja" = "Japanese"; 

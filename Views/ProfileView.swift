@@ -15,7 +15,7 @@ struct ProfileView: View {
                 }
                 .padding(.vertical)
             }
-            .navigationTitle(NSLocalizedString("profile.title", comment: ""))
+            .navigationTitle(NSLocalizedString("profile.title", comment: "Profile screen title"))
             .navigationBarItems(trailing: Button(action: {
                 showingSettings = true
             }) {
@@ -28,28 +28,32 @@ struct ProfileView: View {
     }
 }
 
-// MARK: - Profile Header
+// MARK: - Profile Header View
 private struct ProfileHeader: View {
     var body: some View {
         VStack(spacing: 15) {
+            // User Avatar
             Image(systemName: "person.circle.fill")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 100, height: 100)
                 .foregroundColor(.blue)
             
-            Text(NSLocalizedString("profile.username", comment: ""))
+            // Username
+            Text(NSLocalizedString("profile.username", comment: "User's display name"))
                 .font(.title2)
                 .fontWeight(.bold)
             
-            Text(NSLocalizedString("profile.signature", comment: ""))
+            // User Signature
+            Text(NSLocalizedString("profile.signature", comment: "User's personal signature"))
                 .font(.subheadline)
                 .foregroundColor(.gray)
             
+            // Streak Badge
             HStack {
                 Image(systemName: "flame.fill")
                     .foregroundColor(.orange)
-                Text(NSLocalizedString("profile.streak", comment: ""))
+                Text(NSLocalizedString("profile.streak", comment: "User's focus streak"))
                     .font(.caption)
                     .foregroundColor(.orange)
             }
@@ -66,29 +70,29 @@ private struct ProfileHeader: View {
     }
 }
 
-// MARK: - Achievement Stats
+// MARK: - Achievement Stats View
 private struct AchievementStats: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text(NSLocalizedString("profile.monthly_stats", comment: ""))
+            Text(NSLocalizedString("profile.monthly_stats", comment: "Monthly statistics title"))
                 .font(.headline)
             
             HStack(spacing: 20) {
                 StatItem(
                     value: "32",
-                    title: NSLocalizedString("profile.focus_hours", comment: ""),
+                    title: NSLocalizedString("profile.focus_hours", comment: "Total focus hours"),
                     icon: "clock.fill",
                     color: .blue
                 )
                 StatItem(
                     value: "15",
-                    title: NSLocalizedString("profile.completed_goals", comment: ""),
+                    title: NSLocalizedString("profile.completed_goals", comment: "Number of completed goals"),
                     icon: "checkmark.circle.fill",
                     color: .green
                 )
                 StatItem(
                     value: "28",
-                    title: NSLocalizedString("profile.writing_days", comment: ""),
+                    title: NSLocalizedString("profile.writing_days", comment: "Number of days with diary entries"),
                     icon: "pencil.circle.fill",
                     color: .orange
                 )
@@ -102,43 +106,43 @@ private struct AchievementStats: View {
     }
 }
 
-// MARK: - Function List
+// MARK: - Function List View
 private struct FunctionList: View {
     var body: some View {
         VStack(spacing: 15) {
             Group {
                 FunctionLink(
-                    destination: Text(NSLocalizedString("profile.achievements", comment: "")),
+                    destination: Text(NSLocalizedString("profile.achievements", comment: "Achievements screen title")),
                     icon: "trophy.fill",
-                    title: NSLocalizedString("profile.achievements", comment: ""),
+                    title: NSLocalizedString("profile.achievements", comment: "Achievements menu item"),
                     color: .orange
                 )
                 
                 FunctionLink(
-                    destination: Text(NSLocalizedString("profile.data", comment: "")),
+                    destination: Text(NSLocalizedString("profile.data", comment: "Data report screen title")),
                     icon: "chart.bar.fill",
-                    title: NSLocalizedString("profile.data", comment: ""),
+                    title: NSLocalizedString("profile.data", comment: "Data report menu item"),
                     color: .blue
                 )
                 
                 FunctionLink(
-                    destination: Text(NSLocalizedString("profile.learning", comment: "")),
+                    destination: Text(NSLocalizedString("profile.learning", comment: "Learning history screen title")),
                     icon: "book.fill",
-                    title: NSLocalizedString("profile.learning", comment: ""),
+                    title: NSLocalizedString("profile.learning", comment: "Learning history menu item"),
                     color: .green
                 )
                 
                 FunctionLink(
-                    destination: Text(NSLocalizedString("profile.privacy", comment: "")),
+                    destination: Text(NSLocalizedString("profile.privacy", comment: "Privacy settings screen title")),
                     icon: "lock.fill",
-                    title: NSLocalizedString("profile.privacy", comment: ""),
+                    title: NSLocalizedString("profile.privacy", comment: "Privacy settings menu item"),
                     color: .gray
                 )
                 
                 FunctionLink(
-                    destination: Text(NSLocalizedString("profile.help", comment: "")),
+                    destination: Text(NSLocalizedString("profile.help", comment: "Help and feedback screen title")),
                     icon: "questionmark.circle.fill",
-                    title: NSLocalizedString("profile.help", comment: ""),
+                    title: NSLocalizedString("profile.help", comment: "Help and feedback menu item"),
                     color: .purple
                 )
             }
@@ -202,6 +206,7 @@ private struct FunctionLink<Destination: View>: View {
     }
 }
 
+// MARK: - Preview Provider
 #Preview {
     ProfileView()
 } 

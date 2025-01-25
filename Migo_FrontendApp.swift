@@ -1,19 +1,15 @@
-//
-//  Migo_FrontendApp.swift
-//  Migo-Frontend
-//
-//  Created by 洪承佑 on 2025/1/25.
-//
-
 import SwiftUI
+import Foundation
 
+// MARK: - Main App Entry Point
 @main
 struct Migo_FrontendApp: App {
+    // MARK: - Properties
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("language") private var language: String = {
-        // 獲取系統語言
+        // Get system language
         let systemLanguage = Locale.current.languageCode ?? "en"
-        // 檢查系統語言是否在我們支援的語言列表中
+        // Check if system language is supported
         let supportedLanguages = ["zh-Hant", "en", "ja"]
         if systemLanguage == "zh" {
             return "zh-Hant"
@@ -23,15 +19,16 @@ struct Migo_FrontendApp: App {
         return "en"
     }()
     
+    // MARK: - Initialization
     init() {
-        // 設置應用程序的預設語言
+        // Set default language for the app
         UserDefaults.standard.register(defaults: ["language": language])
         
-        // 強制更新語言設置
+        // Force update language settings
         UserDefaults.standard.set([language], forKey: "AppleLanguages")
         UserDefaults.standard.synchronize()
         
-        // 設置本地化 Bundle
+        // Set up localization bundle
         if let languageBundlePath = Bundle.main.path(forResource: language, ofType: "lproj"),
            let languageBundle = Bundle(path: languageBundlePath) {
             Bundle.main.localizations.forEach { _ in }
@@ -39,13 +36,14 @@ struct Migo_FrontendApp: App {
         }
     }
     
+    // MARK: - Scene Configuration
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(isDarkMode ? .dark : .light)
                 .environment(\.locale, Locale(identifier: language))
                 .onAppear {
-                    // 確保語言設置在每次啟動時都被正確應用
+                    // Ensure language settings are correctly applied on each launch
                     UserDefaults.standard.set([language], forKey: "AppleLanguages")
                     UserDefaults.standard.synchronize()
                 }

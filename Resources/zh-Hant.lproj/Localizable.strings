@@ -12,12 +12,36 @@
 "focus.reset" = "重置";
 "focus.join_group" = "加入小組";
 
+// Focus Status and Buttons
+"focus.status.focusing" = "專注中";
+"focus.status.ready" = "準備開始";
+"focus.button.reset" = "重置計時器";
+"focus.button.pause" = "暫停計時器";
+"focus.button.start" = "開始計時器";
+"focus.button.join_group" = "加入小組";
+
+// Focus Groups
+"focus.groups.my_groups" = "我的小組";
+"focus.groups.recommended" = "推薦小組";
+"focus.groups.select" = "選擇小組";
+"focus.groups.study_group" = "讀書小組";
+"focus.groups.members_focusing" = "3人正在專注";
+"focus.groups.join" = "加入";
+
 // Diary View
 "diary.title" = "日記";
 "diary.quick_note" = "隨手記";
 "diary.new_diary" = "新增日記";
 "diary.mood" = "今日心情";
 "diary.search" = "搜尋日記...";
+"diary.time_format" = "下午 3:30";
+"diary.location.library" = "圖書館";
+"diary.sample_note" = "今天在圖書館學習了新的概念，感覺收穫很多...";
+"diary.study_diary" = "學習日記";
+"diary.sample_content" = "今天的學習計劃完成得不錯，雖然遇到了一些困難...";
+"diary.tag.study" = "學習";
+"diary.tag.reflection" = "反思";
+"diary.title_placeholder" = "輸入標題";
 
 // Group View
 "group.title" = "小組";
@@ -28,6 +52,32 @@
 "group.active" = "活躍小組";
 "group.recommended" = "為你推薦";
 "group.new" = "最新小組";
+"group.all" = "所有小組";
+"group.search" = "搜尋小組...";
+"group.study_group" = "讀書小組";
+"group.members_focusing" = "3人正在專注";
+"group.join_focus" = "加入專注";
+"group.exam_prep" = "考研互助組";
+"group.focus_duration" = "今日專注總時長：%@";
+"group.english_study" = "英語學習小組";
+"group.members_count" = "已有 %d 人加入";
+"group.new_group_name" = "程式設計交流組";
+"group.new_group_description" = "剛剛創建";
+"group.popular_tags" = "熱門標籤";
+
+// Group Tags
+"group.tag.exam" = "考研";
+"group.tag.english" = "英語";
+"group.tag.programming" = "程式設計";
+"group.tag.reading" = "閱讀";
+"group.tag.writing" = "寫作";
+
+// Create Group Form
+"group.section.basic_info" = "基本資訊";
+"group.section.privacy" = "隱私設置";
+"group.section.tags" = "標籤";
+"group.name_placeholder" = "小組名稱";
+"group.is_public" = "公開小組";
 
 // Goals View
 "goals.title" = "目標";
@@ -36,6 +86,40 @@
 "goals.all" = "全部";
 "goals.new" = "新增目標";
 "goals.weekly_progress" = "本週進度";
+"goals.view_details" = "查看詳情";
+"goals.progress_format" = "%d%%";
+"goals.study_goal" = "學習目標";
+"goals.days_remaining" = "剩餘 %d 天";
+"goals.sample_goal" = "完成 Swift UI 課程學習";
+"goals.completion_percentage" = "%d%% 完成";
+
+// Goal Categories
+"goals.category.study" = "學習";
+"goals.category.exercise" = "運動";
+"goals.category.reading" = "閱讀";
+"goals.category.writing" = "寫作";
+"goals.category.other" = "其他";
+
+// Goal Tags
+"goals.tag.programming" = "程式";
+"goals.tag.english" = "英語";
+"goals.tag.fitness" = "健身";
+"goals.tag.reading" = "閱讀";
+"goals.tag.writing" = "寫作";
+"goals.tag.focus" = "專注";
+"goals.tag.learning" = "學習";
+
+// New Goal Form
+"goals.section.basic_info" = "基本資訊";
+"goals.section.category" = "類別";
+"goals.section.end_date" = "截止日期";
+"goals.section.tags" = "標籤";
+"goals.section.reminders" = "提醒";
+"goals.title_placeholder" = "目標標題";
+"goals.select_category" = "選擇類別";
+"goals.select_date" = "選擇日期";
+"goals.daily_reminder" = "每日提醒";
+"goals.completion_reminder" = "完成提醒";
 
 // Profile View
 "profile.title" = "我的";
@@ -69,6 +153,19 @@
 "settings.restart_required" = "請重新啟動應用程序以套用新的語言設置";
 "settings.about" = "關於";
 
+// Settings Descriptions
+"settings.dark_mode.description" = "深色模式可以在夜間提供更舒適的閱讀體驗";
+"settings.notifications.description" = "接收重要通知，不錯過任何重要事項";
+"settings.language.description" = "選擇您偏好的應用程式語言";
+
+// Version Info
+"settings.version_info" = "版本資訊";
+"settings.build" = "構建版本";
+
+// Privacy and Terms
+"settings.privacy_policy.content" = "隱私政策內容...";
+"settings.terms.content" = "服務條款內容...";
+
 // Common
 "common.cancel" = "取消";
 "common.save" = "儲存";
@@ -76,4 +173,9 @@
 "common.edit" = "編輯";
 "common.done" = "完成";
 "common.create" = "創建";
-"common.ok" = "確定"; 
+"common.ok" = "確定";
+
+// Language Names
+"language.zh_hant" = "繁體中文";
+"language.en" = "English";
+"language.ja" = "日本語"; 

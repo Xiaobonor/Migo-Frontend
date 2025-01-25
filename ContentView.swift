@@ -1,46 +1,45 @@
-//
-//  ContentView.swift
-//  Migo-Frontend
-//
-//  Created by 洪承佑 on 2025/1/25.
-//
-
 import SwiftUI
 
+// MARK: - Content View
 struct ContentView: View {
-    @Environment(\.colorScheme) var colorScheme
+    // MARK: - Properties
+    @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("language") private var language = "zh-Hant"
     
+    // MARK: - Body
     var body: some View {
         TabView {
             FocusView()
                 .tabItem {
-                    Label(NSLocalizedString("tab.focus", comment: ""), systemImage: "timer")
+                    Label(NSLocalizedString("tab.focus", comment: "Focus tab"), systemImage: "timer")
                 }
             
             DiaryView()
                 .tabItem {
-                    Label(NSLocalizedString("tab.diary", comment: ""), systemImage: "book.fill")
+                    Label(NSLocalizedString("tab.diary", comment: "Diary tab"), systemImage: "book")
                 }
             
             GroupView()
                 .tabItem {
-                    Label(NSLocalizedString("tab.group", comment: ""), systemImage: "person.3.fill")
+                    Label(NSLocalizedString("tab.group", comment: "Group tab"), systemImage: "person.3")
                 }
             
             GoalsView()
                 .tabItem {
-                    Label(NSLocalizedString("tab.goals", comment: ""), systemImage: "star.fill")
+                    Label(NSLocalizedString("tab.goals", comment: "Goals tab"), systemImage: "flag")
                 }
             
             ProfileView()
                 .tabItem {
-                    Label(NSLocalizedString("tab.profile", comment: ""), systemImage: "person.fill")
+                    Label(NSLocalizedString("tab.profile", comment: "Profile tab"), systemImage: "person")
                 }
         }
-        .accentColor(colorScheme == .dark ? .white : .black)
+        .preferredColorScheme(isDarkMode ? .dark : .light)
+        .environment(\.locale, Locale(identifier: language))
     }
 }
 
+// MARK: - Preview Provider
 #Preview {
     ContentView()
-}
+} 

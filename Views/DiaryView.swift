@@ -1,6 +1,8 @@
 import SwiftUI
 
+// MARK: - Diary View
 struct DiaryView: View {
+    // MARK: - Properties
     @State private var selectedDate = Date()
     @State private var showingQuickNote = false
     @State private var showingNewDiary = false
@@ -9,46 +11,49 @@ struct DiaryView: View {
     private let calendar = Calendar.current
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年MM月dd日"
+        formatter.dateFormat = "yyyy/MM/dd"
         return formatter
     }()
     
+    // MARK: - Body
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // 日曆視圖
+                // Calendar View
                 DatePickerView(selectedDate: $selectedDate)
                     .frame(height: 100)
                     .padding(.horizontal)
                 
-                // 日記列表
+                // Diary List
                 ScrollView {
                     LazyVStack(spacing: 15) {
-                        // 今日心情卡片
+                        // Today's Mood Card
                         if calendar.isDate(selectedDate, inSameDayAs: Date()) {
                             MoodCard()
                                 .padding(.horizontal)
                         }
                         
-                        // 隨手記列表
+                        // Quick Notes List
                         QuickNotesList()
                             .padding(.horizontal)
                         
-                        // 日記列表
+                        // Diary List
                         DiaryList()
                             .padding(.horizontal)
                     }
                     .padding(.vertical)
                 }
             }
-            .navigationTitle("日記")
+            .navigationTitle(NSLocalizedString("diary.title", comment: "Diary screen title"))
             .navigationBarItems(
                 leading: Button(action: { showingQuickNote = true }) {
                     Image(systemName: "square.and.pencil")
-                },
+                }
+                .accessibilityLabel(NSLocalizedString("diary.quick_note", comment: "Quick note button")),
                 trailing: Button(action: { showingNewDiary = true }) {
                     Image(systemName: "plus")
                 }
+                .accessibilityLabel(NSLocalizedString("diary.new_diary", comment: "New diary button"))
             )
             .sheet(isPresented: $showingQuickNote) {
                 QuickNoteView()
@@ -57,10 +62,11 @@ struct DiaryView: View {
                 NewDiaryView()
             }
         }
-        .searchable(text: $searchText, prompt: "搜尋日記...")
+        .searchable(text: $searchText, prompt: NSLocalizedString("diary.search", comment: "Search diary prompt"))
     }
 }
 
+// MARK: - Date Picker View
 struct DatePickerView: View {
     @Binding var selectedDate: Date
     
@@ -80,6 +86,7 @@ struct DatePickerView: View {
     }
 }
 
+// MARK: - Date Cell View
 struct DateCell: View {
     let date: Date
     let isSelected: Bool
@@ -111,10 +118,11 @@ struct DateCell: View {
     }
 }
 
+// MARK: - Mood Card View
 struct MoodCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("今日心情")
+            Text(NSLocalizedString("diary.mood", comment: "Today's mood section"))
                 .font(.headline)
             
             HStack(spacing: 20) {
@@ -133,10 +141,11 @@ struct MoodCard: View {
     }
 }
 
+// MARK: - Quick Notes List View
 struct QuickNotesList: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("隨手記")
+            Text(NSLocalizedString("diary.quick_note", comment: "Quick notes section"))
                 .font(.headline)
             
             ForEach(0..<2) { _ in
@@ -146,11 +155,12 @@ struct QuickNotesList: View {
     }
 }
 
+// MARK: - Quick Note Card View
 struct QuickNoteCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("下午 3:30")
+                Text(NSLocalizedString("diary.time_format", comment: "3:30 PM"))
                     .font(.caption)
                     .foregroundColor(.gray)
                 
@@ -158,12 +168,12 @@ struct QuickNoteCard: View {
                 
                 Image(systemName: "location.fill")
                     .foregroundColor(.gray)
-                Text("圖書館")
+                Text(NSLocalizedString("diary.location.library", comment: "Library location"))
                     .font(.caption)
                     .foregroundColor(.gray)
             }
             
-            Text("今天在圖書館學習了新的概念，感覺收穫很多...")
+            Text(NSLocalizedString("diary.sample_note", comment: "Sample quick note content"))
                 .lineLimit(2)
         }
         .padding()
@@ -173,10 +183,11 @@ struct QuickNoteCard: View {
     }
 }
 
+// MARK: - Diary List View
 struct DiaryList: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("日記")
+            Text(NSLocalizedString("diary.title", comment: "Diary section"))
                 .font(.headline)
             
             ForEach(0..<2) { _ in
@@ -186,11 +197,12 @@ struct DiaryList: View {
     }
 }
 
+// MARK: - Diary Card View
 struct DiaryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("學習日記")
+                Text(NSLocalizedString("diary.study_diary", comment: "Study diary title"))
                     .font(.headline)
                 
                 Spacer()
@@ -198,12 +210,15 @@ struct DiaryCard: View {
                 Text("😊")
             }
             
-            Text("今天的學習計劃完成得不錯，雖然遇到了一些困難...")
+            Text(NSLocalizedString("diary.sample_content", comment: "Sample diary content"))
                 .lineLimit(3)
                 .font(.subheadline)
             
             HStack {
-                ForEach(["學習", "反思"], id: \.self) { tag in
+                ForEach([
+                    NSLocalizedString("diary.tag.study", comment: "Study tag"),
+                    NSLocalizedString("diary.tag.reflection", comment: "Reflection tag")
+                ], id: \.self) { tag in
                     Text("#\(tag)")
                         .font(.caption)
                         .padding(.horizontal, 8)
@@ -220,6 +235,7 @@ struct DiaryCard: View {
     }
 }
 
+// MARK: - Quick Note View
 struct QuickNoteView: View {
     @Environment(\.dismiss) var dismiss
     @State private var noteText = ""
@@ -231,15 +247,16 @@ struct QuickNoteView: View {
                     .padding()
                     .background(Color(.systemBackground))
             }
-            .navigationTitle("隨手記")
+            .navigationTitle(NSLocalizedString("diary.quick_note", comment: "Quick note screen title"))
             .navigationBarItems(
-                leading: Button("取消") { dismiss() },
-                trailing: Button("儲存") { dismiss() }
+                leading: Button(NSLocalizedString("common.cancel", comment: "Cancel button")) { dismiss() },
+                trailing: Button(NSLocalizedString("common.save", comment: "Save button")) { dismiss() }
             )
         }
     }
 }
 
+// MARK: - New Diary View
 struct NewDiaryView: View {
     @Environment(\.dismiss) var dismiss
     @State private var diaryText = ""
@@ -248,32 +265,19 @@ struct NewDiaryView: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("標題")) {
-                    TextField("輸入標題", text: $title)
-                }
+            VStack {
+                TextField(NSLocalizedString("diary.title_placeholder", comment: "Diary title placeholder"), text: $title)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
                 
-                Section(header: Text("心情")) {
-                    HStack {
-                        ForEach(["😊", "😐", "😢", "😡", "🤔"], id: \.self) { mood in
-                            Button(action: { selectedMood = mood }) {
-                                Text(mood)
-                                    .font(.system(size: 25))
-                                    .opacity(selectedMood == mood ? 1 : 0.5)
-                            }
-                        }
-                    }
-                }
-                
-                Section(header: Text("內容")) {
-                    TextEditor(text: $diaryText)
-                        .frame(height: 200)
-                }
+                TextEditor(text: $diaryText)
+                    .padding()
+                    .background(Color(.systemBackground))
             }
-            .navigationTitle("新增日記")
+            .navigationTitle(NSLocalizedString("diary.new_diary", comment: "New diary screen title"))
             .navigationBarItems(
-                leading: Button("取消") { dismiss() },
-                trailing: Button("儲存") { dismiss() }
+                leading: Button(NSLocalizedString("common.cancel", comment: "Cancel button")) { dismiss() },
+                trailing: Button(NSLocalizedString("common.save", comment: "Save button")) { dismiss() }
             )
         }
     }

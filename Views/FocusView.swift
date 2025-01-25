@@ -1,15 +1,18 @@
 import SwiftUI
 
+// MARK: - Focus View
 struct FocusView: View {
-    @State private var timeRemaining: Int = 25 * 60 // 25分鐘
+    // MARK: - Properties
+    @State private var timeRemaining: Int = 25 * 60 // 25 minutes
     @State private var isActive: Bool = false
     @State private var timer: Timer?
     @State private var showingGroupSheet = false
     
+    // MARK: - Body
     var body: some View {
         NavigationView {
             VStack(spacing: 30) {
-                // 計時器顯示
+                // Timer Display
                 ZStack {
                     Circle()
                         .stroke(lineWidth: 20)
@@ -27,7 +30,7 @@ struct FocusView: View {
                         Text("\(timeRemaining / 60):\(String(format: "%02d", timeRemaining % 60))")
                             .font(.system(size: 60, weight: .bold, design: .rounded))
                         
-                        Text(isActive ? "專注中" : "準備開始")
+                        Text(isActive ? NSLocalizedString("focus.status.focusing", comment: "Status when timer is running") : NSLocalizedString("focus.status.ready", comment: "Status when timer is ready"))
                             .font(.title2)
                             .foregroundColor(.gray)
                     }
@@ -35,7 +38,7 @@ struct FocusView: View {
                 .frame(width: 300, height: 300)
                 .padding()
                 
-                // 控制按鈕
+                // Control Buttons
                 HStack(spacing: 30) {
                     Button(action: resetTimer) {
                         Image(systemName: "arrow.clockwise")
@@ -45,6 +48,7 @@ struct FocusView: View {
                             .background(Color.blue.opacity(0.2))
                             .clipShape(Circle())
                     }
+                    .accessibilityLabel(NSLocalizedString("focus.button.reset", comment: "Reset timer button"))
                     
                     Button(action: toggleTimer) {
                         Image(systemName: isActive ? "pause.fill" : "play.fill")
@@ -54,6 +58,7 @@ struct FocusView: View {
                             .background(isActive ? Color.red : Color.green)
                             .clipShape(Circle())
                     }
+                    .accessibilityLabel(isActive ? NSLocalizedString("focus.button.pause", comment: "Pause timer button") : NSLocalizedString("focus.button.start", comment: "Start timer button"))
                     
                     Button(action: { showingGroupSheet = true }) {
                         Image(systemName: "person.3")
@@ -63,11 +68,12 @@ struct FocusView: View {
                             .background(Color.blue.opacity(0.2))
                             .clipShape(Circle())
                     }
+                    .accessibilityLabel(NSLocalizedString("focus.button.join_group", comment: "Join group button"))
                 }
             }
-            .navigationTitle("專注")
+            .navigationTitle(NSLocalizedString("focus.title", comment: "Focus screen title"))
             .navigationBarItems(trailing: Button(action: {
-                // 打開設置
+                // Open settings
             }) {
                 Image(systemName: "gear")
             })
@@ -77,6 +83,7 @@ struct FocusView: View {
         }
     }
     
+    // MARK: - Timer Methods
     private func toggleTimer() {
         if isActive {
             timer?.invalidate()
@@ -103,30 +110,36 @@ struct FocusView: View {
     }
 }
 
+// MARK: - Group Selection View
 struct GroupSelectionView: View {
+    // MARK: - Properties
+    @Environment(\.dismiss) var dismiss
+    
+    // MARK: - Body
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("我的小組")) {
+                Section(header: Text(NSLocalizedString("focus.groups.my_groups", comment: "My groups section"))) {
                     ForEach(0..<3) { _ in
                         GroupRowView()
                     }
                 }
                 
-                Section(header: Text("推薦小組")) {
+                Section(header: Text(NSLocalizedString("focus.groups.recommended", comment: "Recommended groups section"))) {
                     ForEach(0..<5) { _ in
                         GroupRowView()
                     }
                 }
             }
-            .navigationTitle("選擇小組")
-            .navigationBarItems(trailing: Button("完成") {
-                // 關閉sheet
+            .navigationTitle(NSLocalizedString("focus.groups.select", comment: "Select group screen title"))
+            .navigationBarItems(trailing: Button(NSLocalizedString("common.done", comment: "Done button")) {
+                dismiss()
             })
         }
     }
 }
 
+// MARK: - Group Row View
 struct GroupRowView: View {
     var body: some View {
         HStack {
@@ -134,24 +147,25 @@ struct GroupRowView: View {
                 .foregroundColor(.blue)
             
             VStack(alignment: .leading) {
-                Text("讀書小組")
+                Text(NSLocalizedString("focus.groups.study_group", comment: "Study group name"))
                     .font(.headline)
-                Text("3人正在專注")
+                Text(NSLocalizedString("focus.groups.members_focusing", comment: "Number of members focusing"))
                     .font(.subheadline)
                     .foregroundColor(.gray)
             }
             
             Spacer()
             
-            Button(action: {}) {
-                Text("加入")
-                    .foregroundColor(.blue)
+            Button(NSLocalizedString("focus.groups.join", comment: "Join group button")) {
+                // Join group action
             }
+            .foregroundColor(.blue)
         }
         .padding(.vertical, 8)
     }
 }
 
+// MARK: - Preview Provider
 #Preview {
     FocusView()
 } 

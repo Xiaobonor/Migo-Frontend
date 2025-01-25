@@ -1,49 +1,54 @@
 import SwiftUI
 
+// MARK: - Group View
 struct GroupView: View {
+    // MARK: - Properties
     @State private var selectedTab = 0
     @State private var showingCreateGroup = false
     @State private var searchText = ""
     
+    // MARK: - Body
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // 分段控制器
+                // Segment Control
                 Picker("", selection: $selectedTab) {
-                    Text("我的小組").tag(0)
-                    Text("探索").tag(1)
+                    Text(NSLocalizedString("group.my_groups", comment: "My groups tab")).tag(0)
+                    Text(NSLocalizedString("group.explore", comment: "Explore tab")).tag(1)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
                 
-                // 主要內容
+                // Main Content
                 if selectedTab == 0 {
                     MyGroupsView()
                 } else {
                     ExploreGroupsView()
                 }
             }
-            .navigationTitle("小組")
+            .navigationTitle(NSLocalizedString("group.title", comment: "Group screen title"))
             .navigationBarItems(trailing: Button(action: {
                 showingCreateGroup = true
             }) {
                 Image(systemName: "plus")
-            })
+            }
+            .accessibilityLabel(NSLocalizedString("group.create", comment: "Create group button")))
             .sheet(isPresented: $showingCreateGroup) {
                 CreateGroupView()
             }
         }
-        .searchable(text: $searchText, prompt: "搜尋小組...")
+        .searchable(text: $searchText, prompt: NSLocalizedString("group.search", comment: "Search groups prompt"))
     }
 }
 
+// MARK: - My Groups View
 struct MyGroupsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 15) {
-                // 活躍小組
+                // Active Groups
                 VStack(alignment: .leading) {
-                    Text("活躍小組")
+                    Text(NSLocalizedString("group.active", comment: "Active groups section"))
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -57,9 +62,9 @@ struct MyGroupsView: View {
                     }
                 }
                 
-                // 我的小組列表
+                // All Groups List
                 VStack(alignment: .leading) {
-                    Text("所有小組")
+                    Text(NSLocalizedString("group.all", comment: "All groups section"))
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -73,10 +78,11 @@ struct MyGroupsView: View {
     }
 }
 
+// MARK: - Active Group Card
 struct ActiveGroupCard: View {
     var body: some View {
         VStack(alignment: .leading) {
-            // 小組頭像
+            // Group Avatar
             ZStack {
                 Circle()
                     .fill(Color.blue.opacity(0.2))
@@ -86,15 +92,15 @@ struct ActiveGroupCard: View {
                     .foregroundColor(.blue)
             }
             
-            Text("讀書小組")
+            Text(NSLocalizedString("group.study_group", comment: "Study group name"))
                 .font(.headline)
             
-            Text("3人正在專注")
+            Text(NSLocalizedString("group.members_focusing", comment: "Members focusing"))
                 .font(.caption)
                 .foregroundColor(.gray)
             
             Button(action: {}) {
-                Text("加入專注")
+                Text(NSLocalizedString("group.join_focus", comment: "Join focus button"))
                     .font(.caption)
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
@@ -111,11 +117,12 @@ struct ActiveGroupCard: View {
     }
 }
 
+// MARK: - Group List Item
 struct GroupListItem: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                // 小組頭像
+                // Group Avatar
                 Circle()
                     .fill(Color.blue.opacity(0.2))
                     .frame(width: 50, height: 50)
@@ -125,17 +132,17 @@ struct GroupListItem: View {
                     )
                 
                 VStack(alignment: .leading) {
-                    Text("考研互助組")
+                    Text(NSLocalizedString("group.exam_prep", comment: "Exam preparation group"))
                         .font(.headline)
                     
-                    Text("今日專注總時長：4小時30分")
+                    Text(String(format: NSLocalizedString("group.focus_duration", comment: "Today's focus duration"), "4:30"))
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
                 
                 Spacer()
                 
-                // 成就徽章
+                // Achievement Badge
                 Image(systemName: "flame.fill")
                     .foregroundColor(.orange)
                 Text("5")
@@ -144,7 +151,7 @@ struct GroupListItem: View {
             }
             .padding()
             
-            // 進度條
+            // Progress Bar
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Rectangle()
@@ -165,13 +172,14 @@ struct GroupListItem: View {
     }
 }
 
+// MARK: - Explore Groups View
 struct ExploreGroupsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 15) {
-                // 推薦小組
+                // Recommended Groups
                 VStack(alignment: .leading) {
-                    Text("為你推薦")
+                    Text(NSLocalizedString("group.recommended", comment: "Recommended groups section"))
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -180,15 +188,21 @@ struct ExploreGroupsView: View {
                     }
                 }
                 
-                // 熱門標籤
+                // Popular Tags
                 VStack(alignment: .leading) {
-                    Text("熱門標籤")
+                    Text(NSLocalizedString("group.popular_tags", comment: "Popular tags section"))
                         .font(.headline)
                         .padding(.horizontal)
                     
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 10) {
-                            ForEach(["考研", "英語", "程式設計", "閱讀", "寫作"], id: \.self) { tag in
+                            ForEach([
+                                NSLocalizedString("group.tag.exam", comment: "Exam tag"),
+                                NSLocalizedString("group.tag.english", comment: "English tag"),
+                                NSLocalizedString("group.tag.programming", comment: "Programming tag"),
+                                NSLocalizedString("group.tag.reading", comment: "Reading tag"),
+                                NSLocalizedString("group.tag.writing", comment: "Writing tag")
+                            ], id: \.self) { tag in
                                 Text("#\(tag)")
                                     .font(.subheadline)
                                     .padding(.horizontal, 15)
@@ -201,9 +215,9 @@ struct ExploreGroupsView: View {
                     }
                 }
                 
-                // 最新小組
+                // New Groups
                 VStack(alignment: .leading) {
-                    Text("最新小組")
+                    Text(NSLocalizedString("group.new", comment: "New groups section"))
                         .font(.headline)
                         .padding(.horizontal)
                     
@@ -217,6 +231,7 @@ struct ExploreGroupsView: View {
     }
 }
 
+// MARK: - Recommended Group Card
 struct RecommendedGroupCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -230,10 +245,10 @@ struct RecommendedGroupCard: View {
                     )
                 
                 VStack(alignment: .leading) {
-                    Text("英語學習小組")
+                    Text(NSLocalizedString("group.english_study", comment: "English study group"))
                         .font(.headline)
                     
-                    Text("已有 128 人加入")
+                    Text(String(format: NSLocalizedString("group.members_count", comment: "Members count"), 128))
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
@@ -241,7 +256,7 @@ struct RecommendedGroupCard: View {
                 Spacer()
                 
                 Button(action: {}) {
-                    Text("加入")
+                    Text(NSLocalizedString("group.join", comment: "Join button"))
                         .foregroundColor(.blue)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 8)
@@ -277,6 +292,7 @@ struct RecommendedGroupCard: View {
     }
 }
 
+// MARK: - New Group Card
 struct NewGroupCard: View {
     var body: some View {
         HStack {
@@ -289,10 +305,10 @@ struct NewGroupCard: View {
                 )
             
             VStack(alignment: .leading) {
-                Text("程式設計交流組")
+                Text(NSLocalizedString("group.new_group_name", comment: "New group name"))
                     .font(.headline)
                 
-                Text("剛剛創建")
+                Text(NSLocalizedString("group.new_group_description", comment: "New group description"))
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -300,7 +316,7 @@ struct NewGroupCard: View {
             Spacer()
             
             Button(action: {}) {
-                Text("加入")
+                Text(NSLocalizedString("group.join", comment: "Join button"))
                     .foregroundColor(.blue)
             }
         }
@@ -312,29 +328,37 @@ struct NewGroupCard: View {
     }
 }
 
+// MARK: - Create Group View
 struct CreateGroupView: View {
     @Environment(\.dismiss) var dismiss
     @State private var groupName = ""
     @State private var groupDescription = ""
-    @State private var isPrivate = false
+    @State private var isPublic = true
     @State private var selectedTags: Set<String> = []
-    
-    let availableTags = ["學習", "考研", "英語", "程式", "閱讀", "寫作", "互助"]
     
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("基本資訊")) {
-                    TextField("小組名稱", text: $groupName)
+                Section(header: Text(NSLocalizedString("group.section.basic_info", comment: "Basic info section"))) {
+                    TextField(NSLocalizedString("group.name_placeholder", comment: "Group name placeholder"), text: $groupName)
                     TextEditor(text: $groupDescription)
                         .frame(height: 100)
-                    Toggle("私密小組", isOn: $isPrivate)
                 }
                 
-                Section(header: Text("標籤")) {
+                Section(header: Text(NSLocalizedString("group.section.privacy", comment: "Privacy section"))) {
+                    Toggle(NSLocalizedString("group.is_public", comment: "Public group toggle"), isOn: $isPublic)
+                }
+                
+                Section(header: Text(NSLocalizedString("group.section.tags", comment: "Tags section"))) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
-                            ForEach(availableTags, id: \.self) { tag in
+                            ForEach([
+                                NSLocalizedString("group.tag.exam", comment: "Exam tag"),
+                                NSLocalizedString("group.tag.english", comment: "English tag"),
+                                NSLocalizedString("group.tag.programming", comment: "Programming tag"),
+                                NSLocalizedString("group.tag.reading", comment: "Reading tag"),
+                                NSLocalizedString("group.tag.writing", comment: "Writing tag")
+                            ], id: \.self) { tag in
                                 TagButton(tag: tag, isSelected: selectedTags.contains(tag)) {
                                     if selectedTags.contains(tag) {
                                         selectedTags.remove(tag)
@@ -347,33 +371,16 @@ struct CreateGroupView: View {
                     }
                 }
             }
-            .navigationTitle("創建小組")
+            .navigationTitle(NSLocalizedString("group.create", comment: "Create group screen title"))
             .navigationBarItems(
-                leading: Button("取消") { dismiss() },
-                trailing: Button("創建") { dismiss() }
+                leading: Button(NSLocalizedString("common.cancel", comment: "Cancel button")) { dismiss() },
+                trailing: Button(NSLocalizedString("common.create", comment: "Create button")) { dismiss() }
             )
         }
     }
 }
 
-struct TagButton: View {
-    let tag: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text("#\(tag)")
-                .font(.subheadline)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(isSelected ? Color.blue : Color.blue.opacity(0.1))
-                .foregroundColor(isSelected ? .white : .blue)
-                .cornerRadius(15)
-        }
-    }
-}
-
+// MARK: - Preview Provider
 #Preview {
     GroupView()
 } 
