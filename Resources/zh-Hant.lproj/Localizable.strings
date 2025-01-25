@@ -163,8 +163,26 @@
 "settings.build" = "構建版本";
 
 // Privacy and Terms
-"settings.privacy_policy.content" = "隱私政策內容...";
-"settings.terms.content" = "服務條款內容...";
+"settings.privacy_policy.title" = "隱私政策";
+"settings.terms.title" = "服務條款";
+"settings.privacy_policy.last_updated" = "最後更新：2024年3月";
+"settings.terms.last_updated" = "最後更新：2024年3月";
+
+"settings.privacy_policy.content" = "我們重視您的隱私\n\n1. 資料收集\n我們只收集必要的資料來提供更好的服務。這包括：\n• 基本帳戶資訊\n• 使用數據\n• 裝置資訊\n\n2. 資料使用\n我們使用收集的資料來：\n• 改善服務品質\n• 個人化您的體驗\n• 提供客戶支援\n\n3. 資料保護\n我們採用業界標準的加密技術來保護您的資料安全。\n\n4. 您的權利\n您擁有：\n• 查看個人資料的權利\n• 更正資料的權利\n• 刪除資料的權利\n\n5. Cookie 使用\n我們使用 Cookie 來改善您的使用體驗。";
+
+"settings.terms.content" = "歡迎使用我們的服務\n\n1. 服務使用規範\n• 請遵守相關法律法規\n• 尊重其他使用者的權利\n• 不得進行違法或危害他人的行為\n\n2. 帳戶責任\n• 保護您的帳戶安全\n• 對帳戶活動負責\n• 不得與他人共享帳戶\n\n3. 智慧財產權\n• 尊重著作權\n• 不得未經授權使用他人內容\n• 自創內容的權利歸屬\n\n4. 服務變更\n• 我們保留更新服務的權利\n• 重要變更將提前通知\n\n5. 免責聲明\n• 服務「按現狀」提供\n• 不保證服務不中斷\n• 對間接損失不承擔責任";
+
+"settings.privacy_policy.section.data_collection" = "資料收集";
+"settings.privacy_policy.section.data_usage" = "資料使用";
+"settings.privacy_policy.section.data_protection" = "資料保護";
+"settings.privacy_policy.section.your_rights" = "您的權利";
+"settings.privacy_policy.section.cookies" = "Cookie 使用";
+
+"settings.terms.section.usage" = "使用規範";
+"settings.terms.section.account" = "帳戶責任";
+"settings.terms.section.ip" = "智慧財產權";
+"settings.terms.section.changes" = "服務變更";
+"settings.terms.section.disclaimer" = "免責聲明";
 
 // Common
 "common.cancel" = "取消";

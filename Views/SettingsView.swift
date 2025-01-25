@@ -10,14 +10,20 @@ struct SettingsView: View {
     @State private var notificationsEnabled = true
     @State private var needsRestart = false
     @State private var selectedLanguage: String
+    @State private var showingLanguageSheet = false
+    @State private var showingLogoutAlert = false
+    @State private var selectedSection: String? = nil
+    @State private var animateBackground = false
     
     // Language configuration
-    private let languages = ["zh-Hant", "en", "ja"]
+    private let languages = ["zh-Hant", "en"]
     private let languageNames = [
         NSLocalizedString("language.zh_hant", comment: "Traditional Chinese"),
-        NSLocalizedString("language.en", comment: "English"),
-        NSLocalizedString("language.ja", comment: "Japanese")
+        NSLocalizedString("language.en", comment: "English")
     ]
+    
+    // MARK: - Animation Properties
+    @Namespace private var animation
     
     // MARK: - Initialization
     init(isDarkMode: Binding<Bool>) {
@@ -32,171 +38,316 @@ struct SettingsView: View {
     // MARK: - Body
     var body: some View {
         NavigationView {
-            List {
-                displaySection
-                notificationsSection
-                languageSection
-                aboutSection
-                logoutSection
+            ZStack {
+                // Animated Background
+                Color(isDarkMode ? .systemBackground : .secondarySystemBackground)
+                    .ignoresSafeArea()
+                    .overlay(
+                        GeometryReader { geometry in
+                            Circle()
+                                .fill(Color.blue.opacity(0.1))
+                                .frame(width: geometry.size.width * 0.8)
+                                .offset(x: animateBackground ? geometry.size.width * 0.3 : -geometry.size.width * 0.3,
+                                      y: animateBackground ? geometry.size.height * 0.2 : geometry.size.height * 0.4)
+                                .blur(radius: 50)
+                            
+                            Circle()
+                                .fill(Color.purple.opacity(0.1))
+                                .frame(width: geometry.size.width * 0.6)
+                                .offset(x: animateBackground ? -geometry.size.width * 0.2 : geometry.size.width * 0.2,
+                                      y: animateBackground ? geometry.size.height * 0.4 : geometry.size.height * 0.2)
+                                .blur(radius: 50)
+                        }
+                    )
+                    .animation(.default, value: isDarkMode)
+                
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Profile Section
+                        profileSection
+                            .transition(.scale.combined(with: .opacity))
+                        
+                        // Main Settings
+                        settingsSection
+                            .transition(.scale.combined(with: .opacity))
+                        
+                        // About Section
+                        aboutSection
+                            .transition(.scale.combined(with: .opacity))
+                        
+                        // Logout Button
+                        logoutButton
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                    .padding()
+                }
             }
             .navigationTitle(NSLocalizedString("settings.title", comment: "Settings screen title"))
             .navigationBarItems(trailing: Button(NSLocalizedString("common.done", comment: "Done button")) {
                 dismiss()
             })
-            .alert(NSLocalizedString("settings.language_changed", comment: "Language change alert title"), isPresented: $needsRestart) {
+            .sheet(isPresented: $showingLanguageSheet) {
+                languageSelectionSheet
+            }
+            .alert(NSLocalizedString("settings.logout", comment: "Logout"), isPresented: $showingLogoutAlert) {
+                Button(NSLocalizedString("common.cancel", comment: "Cancel button"), role: .cancel) {}
+                Button(NSLocalizedString("settings.logout", comment: "Logout button"), role: .destructive) {
+                    // Handle logout
+                }
+            } message: {
+                Text(NSLocalizedString("settings.logout_confirmation", comment: "Logout confirmation message"))
+            }
+            .alert(NSLocalizedString("settings.language_changed", comment: "Language changed"), isPresented: $needsRestart) {
                 Button(NSLocalizedString("common.ok", comment: "OK button"), role: .cancel) {
                     needsRestart = false
                 }
             } message: {
-                Text(NSLocalizedString("settings.restart_required", comment: "Language change restart message"))
+                Text(NSLocalizedString("settings.restart_required", comment: "Restart required message"))
             }
-            .environment(\.colorScheme, isDarkMode ? .dark : .light)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                    animateBackground = true
+                }
+            }
+            .preferredColorScheme(isDarkMode ? .dark : .light)
         }
     }
     
-    // MARK: - Section Views
-    private var displaySection: some View {
-        Section {
-            HStack {
-                Label {
-                    Text(NSLocalizedString("settings.dark_mode", comment: "Dark mode toggle"))
-                } icon: {
-                    Image(systemName: isDarkMode ? "moon.fill" : "sun.max.fill")
-                        .foregroundColor(isDarkMode ? .purple : .orange)
-                }
-                
-                Spacer()
-                
-                Toggle("", isOn: $isDarkMode)
-                    .labelsHidden()
-            }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                withAnimation {
-                    isDarkMode.toggle()
-                }
-            }
-        } header: {
-            Text(NSLocalizedString("settings.display", comment: "Display settings section"))
-        } footer: {
-            Text(NSLocalizedString("settings.dark_mode.description", comment: "Dark mode description"))
+    // MARK: - Profile Section
+    private var profileSection: some View {
+        VStack {
+            Image(systemName: "person.circle.fill")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 80, height: 80)
+                .foregroundColor(.blue)
+                .overlay(
+                    Circle()
+                        .stroke(Color.blue.opacity(0.2), lineWidth: 4)
+                        .scaleEffect(animateBackground ? 1.1 : 1.0)
+                )
+                .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: animateBackground)
+            
+            Text(NSLocalizedString("profile.username", comment: "Username"))
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            Text(NSLocalizedString("profile.signature", comment: "User signature"))
+                .font(.subheadline)
+                .foregroundColor(.secondary)
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        )
     }
     
-    private var notificationsSection: some View {
-        Section {
-            HStack {
-                Label {
-                    Text(NSLocalizedString("settings.enable_notifications", comment: "Enable notifications toggle"))
-                } icon: {
-                    Image(systemName: notificationsEnabled ? "bell.fill" : "bell.slash.fill")
-                        .foregroundColor(notificationsEnabled ? .blue : .gray)
+    // MARK: - Settings Section
+    private var settingsSection: some View {
+        VStack(spacing: 16) {
+            settingsCard(
+                title: NSLocalizedString("settings.display", comment: "Display settings"),
+                icon: "paintbrush.fill",
+                color: .blue
+            ) {
+                // Dark Mode Toggle
+                settingsRow(
+                    title: NSLocalizedString("settings.dark_mode", comment: "Dark mode"),
+                    icon: "moon.fill",
+                    color: .purple
+                ) {
+                    Toggle("", isOn: $isDarkMode)
+                        .labelsHidden()
                 }
+                .matchedGeometryEffect(id: "darkMode", in: animation)
                 
-                Spacer()
-                
-                Toggle("", isOn: $notificationsEnabled)
-                    .labelsHidden()
-            }
-        } header: {
-            Text(NSLocalizedString("settings.notifications", comment: "Notifications settings section"))
-        } footer: {
-            Text(NSLocalizedString("settings.notifications.description", comment: "Notifications description"))
-        }
-    }
-    
-    private var languageSection: some View {
-        Section {
-            Picker(selection: Binding(
-                get: { selectedLanguageIndex },
-                set: { newValue in
-                    selectedLanguage = languages[newValue]
-                    if language != selectedLanguage {
-                        language = selectedLanguage
-                        needsRestart = true
-                    }
-                }
-            )) {
-                ForEach(0..<languageNames.count, id: \.self) { index in
+                // Language Selection
+                settingsRow(
+                    title: NSLocalizedString("settings.language", comment: "Language"),
+                    icon: "globe",
+                    color: .green,
+                    showDivider: false
+                ) {
                     HStack {
-                        Text(languageNames[index])
-                        if languages[index] == language {
-                            Spacer()
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
-                        }
-                    }
-                    .tag(index)
-                }
-            } label: {
-                Label {
-                    Text(NSLocalizedString("settings.select_language", comment: "Language selection picker"))
-                } icon: {
-                    Image(systemName: "globe")
-                        .foregroundColor(.blue)
-                }
-            }
-        } header: {
-            Text(NSLocalizedString("settings.language", comment: "Language settings section"))
-        } footer: {
-            Text(NSLocalizedString("settings.language.description", comment: "Language settings description"))
-        }
-    }
-    
-    private var aboutSection: some View {
-        Section {
-            NavigationLink {
-                VersionInfoView()
-            } label: {
-                Label {
-                    HStack {
-                        Text(NSLocalizedString("settings.version", comment: "Version label"))
-                        Spacer()
-                        Text("1.0.0")
+                        Text(NSLocalizedString(languages.first { $0 == language } ?? "", comment: "Language name"))
+                            .foregroundColor(.secondary)
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
                             .foregroundColor(.secondary)
                     }
-                } icon: {
-                    Image(systemName: "info.circle.fill")
-                        .foregroundColor(.blue)
+                    .onTapGesture {
+                        showingLanguageSheet = true
+                    }
                 }
+                .matchedGeometryEffect(id: "language", in: animation)
             }
             
-            NavigationLink {
-                PrivacyPolicyView()
-            } label: {
-                Label {
-                    Text(NSLocalizedString("settings.privacy_policy", comment: "Privacy policy button"))
-                } icon: {
-                    Image(systemName: "hand.raised.fill")
-                        .foregroundColor(.blue)
+            settingsCard(
+                title: NSLocalizedString("settings.notifications", comment: "Notifications"),
+                icon: "bell.fill",
+                color: .red
+            ) {
+                settingsRow(
+                    title: NSLocalizedString("settings.enable_notifications", comment: "Enable notifications"),
+                    icon: "bell.badge.fill",
+                    color: .red,
+                    showDivider: false
+                ) {
+                    Toggle("", isOn: .constant(true))
+                        .labelsHidden()
                 }
             }
-            
-            NavigationLink {
-                TermsView()
-            } label: {
-                Label {
-                    Text(NSLocalizedString("settings.terms", comment: "Terms of service button"))
-                } icon: {
-                    Image(systemName: "doc.text.fill")
-                        .foregroundColor(.blue)
-                }
-            }
-        } header: {
-            Text(NSLocalizedString("settings.about", comment: "About section"))
         }
     }
     
-    private var logoutSection: some View {
-        Section {
-            Button(role: .destructive) {
-                // Perform logout
-            } label: {
-                Label {
-                    Text(NSLocalizedString("settings.logout", comment: "Logout button"))
-                } icon: {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
+    // MARK: - About Section
+    private var aboutSection: some View {
+        settingsCard(
+            title: NSLocalizedString("settings.about", comment: "About"),
+            icon: "info.circle.fill",
+            color: .orange
+        ) {
+            NavigationLink(destination: LegalDocumentView(documentType: .privacyPolicy)) {
+                settingsRow(
+                    title: NSLocalizedString("settings.privacy_policy", comment: "Privacy policy"),
+                    icon: "lock.fill",
+                    color: .blue
+                ) {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            NavigationLink(destination: LegalDocumentView(documentType: .terms)) {
+                settingsRow(
+                    title: NSLocalizedString("settings.terms", comment: "Terms of service"),
+                    icon: "doc.text.fill",
+                    color: .green
+                ) {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            settingsRow(
+                title: NSLocalizedString("settings.version", comment: "Version"),
+                icon: "number.circle.fill",
+                color: .purple,
+                showDivider: false
+            ) {
+                Text("1.0.0")
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    // MARK: - Logout Button
+    private var logoutButton: some View {
+        Button(action: { showingLogoutAlert = true }) {
+            HStack {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+                    .foregroundColor(.red)
+                Text(NSLocalizedString("settings.logout", comment: "Logout"))
+                    .foregroundColor(.red)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.red.opacity(0.1))
+            )
+        }
+    }
+    
+    // MARK: - Language Selection Sheet
+    private var languageSelectionSheet: some View {
+        NavigationView {
+            List {
+                ForEach(languages, id: \.self) { languageCode in
+                    Button(action: {
+                        if language != languageCode {
+                            language = languageCode
+                            needsRestart = true
+                        }
+                        showingLanguageSheet = false
+                    }) {
+                        HStack {
+                            Text(NSLocalizedString(languageNames[languages.firstIndex(of: languageCode) ?? 0], comment: "Language name"))
+                            Spacer()
+                            if language == languageCode {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                    }
+                    .foregroundColor(.primary)
+                }
+            }
+            .navigationTitle(NSLocalizedString("settings.select_language", comment: "Select language"))
+            .navigationBarItems(trailing: Button(NSLocalizedString("common.done", comment: "Done button")) {
+                showingLanguageSheet = false
+            })
+        }
+    }
+    
+    // MARK: - Helper Views
+    private func settingsCard<Content: View>(
+        title: String,
+        icon: String,
+        color: Color,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                Text(title)
+                    .font(.headline)
+            }
+            .padding(.horizontal)
+            
+            content()
+        }
+        .padding(.vertical)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        )
+    }
+    
+    private func settingsRow<Content: View>(
+        title: String,
+        icon: String,
+        color: Color,
+        showDivider: Bool = true,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .frame(width: 24)
+                
+                Text(title)
+                
+                Spacer()
+                
+                content()
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+            
+            if showDivider {
+                Divider()
+                    .padding(.leading, 52)
             }
         }
     }

@@ -10,7 +10,7 @@ struct Migo_FrontendApp: App {
         // Get system language
         let systemLanguage = Locale.current.languageCode ?? "en"
         // Check if system language is supported
-        let supportedLanguages = ["zh-Hant", "en", "ja"]
+        let supportedLanguages = ["zh-Hant", "en"]
         if systemLanguage == "zh" {
             return "zh-Hant"
         } else if supportedLanguages.contains(systemLanguage) {

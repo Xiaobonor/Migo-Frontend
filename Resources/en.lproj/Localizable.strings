@@ -151,6 +151,7 @@
 "settings.select_language" = "Select Language";
 "settings.language_changed" = "Language Changed";
 "settings.restart_required" = "Please restart the app to apply the new language settings";
+"settings.about" = "About";
 
 // Settings Descriptions
 "settings.dark_mode.description" = "Dark mode provides a more comfortable reading experience at night";
@@ -162,8 +163,26 @@
 "settings.build" = "Build";
 
 // Privacy and Terms
-"settings.privacy_policy.content" = "Privacy Policy content...";
-"settings.terms.content" = "Terms of Service content...";
+"settings.privacy_policy.title" = "Privacy Policy";
+"settings.terms.title" = "Terms of Service";
+"settings.privacy_policy.last_updated" = "Last Updated: March 2024";
+"settings.terms.last_updated" = "Last Updated: March 2024";
+
+"settings.privacy_policy.content" = "We value your privacy\n\n1. Data Collection\nWe only collect necessary data to provide better services. This includes:\n• Basic account information\n• Usage data\n• Device information\n\n2. Data Usage\nWe use collected data to:\n• Improve service quality\n• Personalize your experience\n• Provide customer support\n\n3. Data Protection\nWe use industry-standard encryption to protect your data.\n\n4. Your Rights\nYou have the right to:\n• Access your personal data\n• Correct your data\n• Delete your data\n\n5. Cookie Usage\nWe use cookies to improve your experience.";
+
+"settings.terms.content" = "Welcome to our service\n\n1. Usage Guidelines\n• Comply with applicable laws\n• Respect other users' rights\n• No illegal or harmful activities\n\n2. Account Responsibilities\n• Protect your account security\n• Be responsible for account activities\n• No account sharing\n\n3. Intellectual Property\n• Respect copyrights\n• No unauthorized use of others' content\n• Rights to original content\n\n4. Service Changes\n• We reserve the right to update services\n• Important changes will be notified in advance\n\n5. Disclaimer\n• Service provided 'as is'\n• No guarantee of uninterrupted service\n• No liability for indirect damages";
+
+"settings.privacy_policy.section.data_collection" = "Data Collection";
+"settings.privacy_policy.section.data_usage" = "Data Usage";
+"settings.privacy_policy.section.data_protection" = "Data Protection";
+"settings.privacy_policy.section.your_rights" = "Your Rights";
+"settings.privacy_policy.section.cookies" = "Cookie Usage";
+
+"settings.terms.section.usage" = "Usage Guidelines";
+"settings.terms.section.account" = "Account Responsibilities";
+"settings.terms.section.ip" = "Intellectual Property";
+"settings.terms.section.changes" = "Service Changes";
+"settings.terms.section.disclaimer" = "Disclaimer";
 
 // Common
 "common.cancel" = "Cancel";
