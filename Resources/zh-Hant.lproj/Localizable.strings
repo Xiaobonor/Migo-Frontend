@@ -11,6 +11,8 @@
 "focus.pause" = "暫停";
 "focus.reset" = "重置";
 "focus.join_group" = "加入小組";
+"focus.custom_time" = "自訂";
+"focus.select_time" = "選擇時間";
 
 // Focus Status and Buttons
 "focus.status.focusing" = "專注中";

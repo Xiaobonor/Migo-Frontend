@@ -11,6 +11,8 @@
 "focus.pause" = "Pause";
 "focus.reset" = "Reset";
 "focus.join_group" = "Join Group";
+"focus.custom_time" = "Custom";
+"focus.select_time" = "Select Time";
 
 // Focus Status and Buttons
 "focus.status.focusing" = "Focusing";
