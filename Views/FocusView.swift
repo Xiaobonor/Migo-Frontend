@@ -17,6 +17,28 @@ struct FocusView: View {
     @State private var circleMinutes: Int = 25 // 一圈代表的分鐘數
     @State private var showToast: Bool = false
     @State private var toastMessage: String = ""
+    @State private var isGroupModeEnabled: Bool = false // 新增：群組模式開關
+    @State private var groupMembers: [GroupMember] = []
+    @State private var isSimulationEnabled: Bool = true // 新增：模擬開關
+    @State private var currentUser: GroupMember = GroupMember(
+        id: UUID(),
+        name: "我",
+        totalSeconds: 0,
+        isActive: false,
+        avatar: ""
+    )
+    
+    // 更改更新頻率為每秒更新一次
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    // 新增：模擬用戶數據
+    private let simulatedMembers: [GroupMember] = [
+        GroupMember(id: UUID(), name: "小明", totalSeconds: 6, isActive: false, avatar: ""), 
+        GroupMember(id: UUID(), name: "小華", totalSeconds: 33, isActive: false, avatar: ""), 
+        GroupMember(id: UUID(), name: "小美", totalSeconds: 3608, isActive: true, avatar: ""), 
+        GroupMember(id: UUID(), name: "小強", totalSeconds: 70, isActive: true, avatar: ""),  
+        GroupMember(id: UUID(), name: "小芳", totalSeconds: 11, isActive: true, avatar: "")  
+    ]
     
     // 格式化時間顯示
     private var timeDisplay: String {
@@ -230,7 +252,7 @@ struct FocusView: View {
                     }
                     
                     // Focus Stats
-                    if !focusSegments.isEmpty {
+                    if !focusSegments.isEmpty && !isActive {
                         VStack(spacing: 20) {
                             HStack(spacing: 20) {
                                 StatCard(
@@ -244,17 +266,26 @@ struct FocusView: View {
                                     icon: "number.circle.fill"
                                 )
                             }
-                            
-                            // Recent Focus Segments
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 15) {
-                                    ForEach(focusSegments.suffix(5).reversed()) { segment in
-                                        FocusSegmentCard(segment: segment)
+                            .padding(.horizontal)
+                        }
+                    }
+                    
+                    // 群組模式顯示
+                    if isGroupModeEnabled && isActive {
+                        VStack(spacing: 15) {
+                            ScrollView {
+                                LazyVStack(spacing: 12) {
+                                    let allMembers = ([currentUser] + groupMembers)
+                                        .sorted { $0.totalSeconds > $1.totalSeconds }
+                                    
+                                    ForEach(allMembers) { member in
+                                        GroupMemberRow(member: member)
                                     }
                                 }
+                                .padding(.horizontal)
                             }
                         }
-                        .padding(.horizontal)
+                        .padding(.top, 20)
                     }
                 }
                 .padding(.vertical, 30)
@@ -264,7 +295,6 @@ struct FocusView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 16) {
-                        // Reset Button
                         if !focusSegments.isEmpty {
                             Button(action: { showingResetAlert = true }) {
                                 Image(systemName: "arrow.counterclockwise")
@@ -273,9 +303,17 @@ struct FocusView: View {
                             .disabled(isActive)
                         }
                         
-                        // Group Button
-                        Button(action: { showingGroupSheet = true }) {
+                        // 修改：群組模式開關（移除點點）
+                        Button(action: { 
+                            isGroupModeEnabled.toggle()
+                            if isGroupModeEnabled && isSimulationEnabled {
+                                groupMembers = simulatedMembers
+                            } else {
+                                groupMembers = []
+                            }
+                        }) {
                             Image(systemName: "person.3")
+                                .foregroundColor(isGroupModeEnabled ? .blue : .secondary)
                         }
                         .disabled(isActive)
                     }
@@ -331,6 +369,43 @@ struct FocusView: View {
             .onAppear {
                 withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
                     animateBackground = true
+                }
+            }
+            .onReceive(timer) { _ in
+                if isGroupModeEnabled && isSimulationEnabled {
+                    // 更新當前用戶狀態 - 使用歷史記錄總時間加上當前專注時間
+                    let userTotalSeconds = focusSegments.reduce(0) { $0 + $1.duration } + Int(elapsedTime)
+                    currentUser = GroupMember(
+                        id: currentUser.id,
+                        name: currentUser.name,
+                        totalSeconds: userTotalSeconds,
+                        isActive: isActive,
+                        avatar: currentUser.avatar
+                    )
+                    
+                    // 更新模擬用戶的狀態和時間
+                    var updatedMembers = groupMembers
+                    for i in 0..<updatedMembers.count {
+                        let member = updatedMembers[i]
+                        let isCurrentlyActive = member.isActive
+                        
+                        // 每30秒有20%的機率改變狀態
+                        let shouldChangeStatus = Int.random(in: 1...30) == 1
+                        let newIsActive = shouldChangeStatus ? !isCurrentlyActive : isCurrentlyActive
+                        
+                        // 如果是活躍狀態，每秒增加0.5-2秒（模擬不同人的專注效率）
+                        let incrementSeconds = isCurrentlyActive ? Double.random(in: 0.5...2.0) : 0
+                        let newSeconds = member.totalSeconds + Int(incrementSeconds)
+                        
+                        updatedMembers[i] = GroupMember(
+                            id: member.id,
+                            name: member.name,
+                            totalSeconds: newSeconds,
+                            isActive: newIsActive,
+                            avatar: member.avatar
+                        )
+                    }
+                    groupMembers = updatedMembers
                 }
             }
         }
@@ -664,6 +739,81 @@ struct TimeSettingsView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Group Member Model
+struct GroupMember: Identifiable {
+    let id: UUID
+    let name: String
+    let totalSeconds: Int  // 改用秒來計算
+    let isActive: Bool
+    var avatar: String
+    
+    var displayTime: String {
+        let hours = totalSeconds / 3600
+        let minutes = (totalSeconds % 3600) / 60
+        let seconds = totalSeconds % 60
+        
+        if hours > 0 {
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            return String(format: "%d:%02d", minutes, seconds)
+        }
+    }
+}
+
+// MARK: - Group Member Row
+struct GroupMemberRow: View {
+    let member: GroupMember
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // 頭像
+            AsyncImage(url: URL(string: member.avatar)) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+            } placeholder: {
+                Image(systemName: "person.circle.fill")
+                    .foregroundColor(.gray)
+            }
+            .frame(width: 40, height: 40)
+            .clipShape(Circle())
+            
+            // 用戶資訊
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(member.name)
+                        .font(.headline)
+                    if member.isActive {
+                        Text("專注中")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color.green.opacity(0.1))
+                            .cornerRadius(4)
+                    }
+                }
+                Text("今日總專注：\(member.displayTime)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .monospacedDigit()
+            }
+            
+            Spacer()
+            
+            // 狀態指示
+            Circle()
+                .fill(member.isActive ? Color.green : Color.gray)
+                .frame(width: 8, height: 8)
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 2)
+        .opacity(member.isActive ? 1 : 0.7)
     }
 }
 
