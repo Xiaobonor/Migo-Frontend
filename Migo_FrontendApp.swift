@@ -8,7 +8,7 @@ struct Migo_FrontendApp: App {
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("language") private var language: String = {
         // Get system language
-        let systemLanguage = Locale.current.languageCode ?? "en"
+        let systemLanguage = Locale.current.language.languageCode?.identifier ?? "en"
         // Check if system language is supported
         let supportedLanguages = ["zh-Hant", "en"]
         if systemLanguage == "zh" {
@@ -29,8 +29,8 @@ struct Migo_FrontendApp: App {
         UserDefaults.standard.synchronize()
         
         // Set up localization bundle
-        if let languageBundlePath = Bundle.main.path(forResource: language, ofType: "lproj"),
-           let languageBundle = Bundle(path: languageBundlePath) {
+        if let languageBundlePath = Bundle.main.path(forResource: language, ofType: "lproj") {
+            _ = Bundle(path: languageBundlePath)
             Bundle.main.localizations.forEach { _ in }
             Bundle.main.preferredLocalizations.forEach { _ in }
         }

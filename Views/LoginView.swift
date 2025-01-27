@@ -60,7 +60,7 @@ struct LoginView: View {
             }
         }
         .padding()
-        .onChange(of: authService.isAuthenticated) { isAuthenticated in
+        .onChange(of: authService.isAuthenticated) { oldValue, isAuthenticated in
             if isAuthenticated {
                 dismiss()
             }

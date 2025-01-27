@@ -89,10 +89,11 @@ class AuthenticationService: ObservableObject {
 // MARK: - UIApplication Extension
 extension UIApplication {
     func topViewController() async -> UIViewController? {
-        let scenes = await self.connectedScenes
-        let windowScene = scenes.first as? UIWindowScene
-        let window = windowScene?.windows.first
-        return window?.rootViewController?.topViewController()
+        guard let scene = await self.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else {
+            return nil
+        }
+        return window.rootViewController?.topViewController()
     }
 }
 

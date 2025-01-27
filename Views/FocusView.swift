@@ -200,7 +200,7 @@ struct FocusView: View {
                                 }
                             }
                         }
-                        .onChange(of: timeline.date) { newDate in
+                        .onChange(of: timeline.date) { oldValue, newDate in
                             if isActive, let startTime = startTime {
                                 withAnimation(.linear(duration: 0.016)) {
                                     elapsedTime = newDate.timeIntervalSince(startTime)

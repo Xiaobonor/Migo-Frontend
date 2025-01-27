@@ -25,7 +25,8 @@ struct GoalsView: View {
                     
                     // Goals List
                     LazyVStack(spacing: 15) {
-                        ForEach(0..<5) { _ in
+                        let goalCount = 5
+                        ForEach(0..<goalCount, id: \.self) { index in
                             GoalCard()
                         }
                     }

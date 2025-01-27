@@ -2,39 +2,51 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- 應用的內部版本號 -->
-    <key>CFBundleVersion</key>
-    <string>1.0</string>
-
-    <!-- 用戶可見的應用版本號 -->
-    <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
-
-    <!-- 應用的 Bundle Identifier -->
-    <key>CFBundleIdentifier</key>
-    <string>tw.xiaobo.Migo-Frontend</string>
-
-    <!-- 應用的顯示名稱 -->
-    <key>CFBundleName</key>
-    <string>Migo Frontend</string>
-
-    <!-- 可執行文件名稱（與 Xcode 目標名稱一致） -->
-    <key>CFBundleExecutable</key>
-    <string>Migo-Frontend</string>
-
-    <!-- 平台的 Bundle Type -->
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-
-    <!-- URL Schemes 配置 -->
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>com.googleusercontent.apps.893906920868-bqg5bdlfvrrlstl1a2mt7t3hp5om9gen</string>
-            </array>
-        </dict>
-    </array>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>tw.xiaobo.Migo-Frontend</string>
+	<key>CFBundleName</key>
+	<string>Migo</string>
+	<key>CFBundleExecutable</key>
+	<string>Migo-Frontend</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.893906920868-bqg5bdlfvrrlstl1a2mt7t3hp5om9gen</string>
+			</array>
+		</dict>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
 </dict>
 </plist>

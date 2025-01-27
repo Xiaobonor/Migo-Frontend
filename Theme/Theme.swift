@@ -2,8 +2,8 @@ import SwiftUI
 
 // MARK: - Colors
 struct AppColors {
-    static let primary = Color("Primary")
-    static let secondary = Color("Secondary")
+    static let migoColor = Color("Primary")
+    static let migoSecondary = Color("Secondary")
     static let accent = Color("Accent")
     static let background = Color("Background")
     static let text = Color("Text")
@@ -56,7 +56,7 @@ struct PrimaryButtonStyle: ViewModifier {
             .foregroundColor(.white)
             .padding(.horizontal, 20)
             .padding(.vertical, 10)
-            .background(AppColors.primary)
+            .background(AppColors.migoColor)
             .cornerRadius(AppDimensions.cornerRadius)
     }
 }
