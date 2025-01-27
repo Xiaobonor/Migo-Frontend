@@ -53,12 +53,13 @@ class AuthenticationService: ObservableObject {
         do {
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: topVC)
             
-            guard let code = result.serverAuthCode else {
+            // 獲取 ID Token
+            guard let idToken = result.user.idToken?.tokenString else {
                 throw APIError.authenticationError
             }
             
-            // 使用授權碼獲取 access token
-            let authResponse = try await APIService.shared.handleGoogleCallback(code: code)
+            // 使用 ID Token 獲取 access token
+            let authResponse = try await APIService.shared.handleGoogleSignIn(idToken: idToken)
             
             // 保存 token
             UserDefaults.standard.set(authResponse.access_token, forKey: "accessToken")

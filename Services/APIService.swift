@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - API Configuration
 struct APIConfig {
-    static let baseURL = "http://localhost:8000"
+    static let baseURL = "http://192.168.1.102:8000"
     static let version = "1.0.0"
     
     // Google OAuth 配置
@@ -20,8 +20,7 @@ struct APIConfig {
 
 // MARK: - API Endpoints
 enum APIEndpoint {
-    static let googleLogin = "/auth/google/login"
-    static let googleCallback = "/auth/google/callback"
+    static let googleSignIn = "/auth/google/signin"
     static let me = "/auth/me"
 }
 
@@ -56,8 +55,16 @@ enum APIError: Error {
 class APIService {
     static let shared = APIService()
     private var accessToken: String?
+    private let jsonDecoder: JSONDecoder
     
-    private init() {}
+    private init() {
+        jsonDecoder = JSONDecoder()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        jsonDecoder.dateDecodingStrategy = .formatted(dateFormatter)
+    }
     
     // 設置 access token
     func setAccessToken(_ token: String) {
@@ -84,17 +91,23 @@ class APIService {
             throw APIError.invalidResponse
         }
         
+        // 打印回應數據，用於調試
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("API Response: \(jsonString)")
+        }
+        
         switch httpResponse.statusCode {
         case 200...299:
             do {
-                return try JSONDecoder().decode(T.self, from: data)
+                return try jsonDecoder.decode(T.self, from: data)
             } catch {
+                print("Decoding Error: \(error)")
                 throw APIError.decodingError
             }
         case 401:
             throw APIError.authenticationError
         default:
-            if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+            if let errorResponse = try? jsonDecoder.decode(ErrorResponse.self, from: data) {
                 throw APIError.serverError(errorResponse.detail)
             }
             throw APIError.invalidResponse
@@ -127,10 +140,10 @@ class APIService {
         return try await request(APIEndpoint.me)
     }
     
-    // 處理 Google 登入回調
-    func handleGoogleCallback(code: String) async throws -> AuthResponse {
-        let endpoint = APIEndpoint.googleCallback + "?code=\(code)"
-        return try await request(endpoint)
+    // 處理 Google 登入
+    func handleGoogleSignIn(idToken: String) async throws -> AuthResponse {
+        let body = try JSONEncoder().encode(["id_token": idToken])
+        return try await request(APIEndpoint.googleSignIn, method: "POST", body: body)
     }
 }
 
@@ -145,25 +158,27 @@ struct AuthResponse: Codable {
 }
 
 struct User: Codable {
+    let id: String?
     let email: String
     let name: String
-    let picture: URL?
+    let picture: String?
     let nickname: String?
     let bio: String?
     let birthday: Date?
     let gender: String?
     let phone: String?
-    let followersCount: Int
-    let followingCount: Int
-    let language: String
-    let notificationEnabled: Bool
-    let theme: String
-    let createdAt: Date
+    let followersCount: Int?
+    let followingCount: Int?
+    let language: String?
+    let notificationEnabled: Bool?
+    let theme: String?
+    let createdAt: Date?
     let lastLogin: Date?
     let lastActive: Date?
     let country: String?
     
     enum CodingKeys: String, CodingKey {
+        case id = "_id"
         case email, name, picture, nickname, bio, birthday, gender, phone
         case followersCount = "followers_count"
         case followingCount = "following_count"
@@ -174,5 +189,31 @@ struct User: Codable {
         case lastLogin = "last_login"
         case lastActive = "last_active"
         case country
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // 必需欄位
+        email = try container.decode(String.self, forKey: .email)
+        name = try container.decode(String.self, forKey: .name)
+        
+        // 可選欄位
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+        picture = try container.decodeIfPresent(String.self, forKey: .picture)
+        nickname = try container.decodeIfPresent(String.self, forKey: .nickname)
+        bio = try container.decodeIfPresent(String.self, forKey: .bio)
+        birthday = try container.decodeIfPresent(Date.self, forKey: .birthday)
+        gender = try container.decodeIfPresent(String.self, forKey: .gender)
+        phone = try container.decodeIfPresent(String.self, forKey: .phone)
+        followersCount = try container.decodeIfPresent(Int.self, forKey: .followersCount)
+        followingCount = try container.decodeIfPresent(Int.self, forKey: .followingCount)
+        language = try container.decodeIfPresent(String.self, forKey: .language)
+        notificationEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationEnabled)
+        theme = try container.decodeIfPresent(String.self, forKey: .theme)
+        createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
+        lastLogin = try container.decodeIfPresent(Date.self, forKey: .lastLogin)
+        lastActive = try container.decodeIfPresent(Date.self, forKey: .lastActive)
+        country = try container.decodeIfPresent(String.self, forKey: .country)
     }
 } 

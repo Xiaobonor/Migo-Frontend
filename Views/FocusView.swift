@@ -770,16 +770,27 @@ struct GroupMemberRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // 頭像
-            AsyncImage(url: URL(string: member.avatar)) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
+            if !member.avatar.isEmpty {
+                AsyncImage(url: URL(string: member.avatar)) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 40, height: 40)
+                        .clipShape(Circle())
+                } placeholder: {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.gray)
+                }
+            } else {
                 Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
                     .foregroundColor(.gray)
             }
-            .frame(width: 40, height: 40)
-            .clipShape(Circle())
             
             // 用戶資訊
             VStack(alignment: .leading, spacing: 4) {

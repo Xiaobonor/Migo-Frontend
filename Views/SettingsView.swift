@@ -129,26 +129,18 @@ struct SettingsView: View {
     private var profileSection: some View {
         VStack {
             if let user = authService.currentUser {
-                if let pictureUrl = user.picture {
-                    AsyncImage(url: pictureUrl) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 80, height: 80)
-                            .clipShape(Circle())
-                    } placeholder: {
-                        Image(systemName: "person.circle.fill")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 80, height: 80)
-                            .foregroundColor(.blue)
-                    }
-                } else {
+                AsyncImage(url: URL(string: user.picture ?? "")) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .clipShape(Circle())
+                } placeholder: {
                     Image(systemName: "person.circle.fill")
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .scaledToFit()
                         .frame(width: 80, height: 80)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.gray)
                 }
                 
                 Text(user.name)

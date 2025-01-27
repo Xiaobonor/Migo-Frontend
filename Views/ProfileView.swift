@@ -30,24 +30,56 @@ struct ProfileView: View {
 
 // MARK: - Profile Header View
 private struct ProfileHeader: View {
+    @StateObject private var authService = AuthenticationService.shared
+    
     var body: some View {
         VStack(spacing: 15) {
             // User Avatar
-            Image(systemName: "person.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 100, height: 100)
-                .foregroundColor(.blue)
-            
-            // Username
-            Text(NSLocalizedString("profile.username", comment: "User's display name"))
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            // User Signature
-            Text(NSLocalizedString("profile.signature", comment: "User's personal signature"))
-                .font(.subheadline)
-                .foregroundColor(.gray)
+            if let user = authService.currentUser {
+                AsyncImage(url: URL(string: user.picture ?? "")) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 100, height: 100)
+                        .clipShape(Circle())
+                } placeholder: {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(.blue)
+                }
+                
+                // Username
+                Text(user.name)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                // User Signature
+                if let bio = user.bio {
+                    Text(bio)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                } else {
+                    Text(NSLocalizedString("profile.signature", comment: "User's personal signature"))
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 100, height: 100)
+                    .foregroundColor(.blue)
+                
+                Text(NSLocalizedString("profile.username", comment: "User's display name"))
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text(NSLocalizedString("profile.signature", comment: "User's personal signature"))
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
             
             // Streak Badge
             HStack {
