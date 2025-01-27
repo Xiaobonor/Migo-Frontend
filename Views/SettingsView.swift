@@ -14,6 +14,8 @@ struct SettingsView: View {
     @State private var showingLogoutAlert = false
     @State private var selectedSection: String? = nil
     @State private var animateBackground = false
+    @State private var showingLoginSheet = false
+    @StateObject private var authService = AuthenticationService.shared
     
     // Language configuration
     private let languages = ["zh-Hant", "en"]
@@ -64,8 +66,10 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Profile Section
-                        profileSection
-                            .transition(.scale.combined(with: .opacity))
+                        if authService.isAuthenticated {
+                            profileSection
+                                .transition(.scale.combined(with: .opacity))
+                        }
                         
                         // Main Settings
                         settingsSection
@@ -75,9 +79,14 @@ struct SettingsView: View {
                         aboutSection
                             .transition(.scale.combined(with: .opacity))
                         
-                        // Logout Button
-                        logoutButton
-                            .transition(.scale.combined(with: .opacity))
+                        // Login/Logout Button
+                        if authService.isAuthenticated {
+                            logoutButton
+                                .transition(.scale.combined(with: .opacity))
+                        } else {
+                            loginButton
+                                .transition(.scale.combined(with: .opacity))
+                        }
                     }
                     .padding()
                 }
@@ -89,10 +98,13 @@ struct SettingsView: View {
             .sheet(isPresented: $showingLanguageSheet) {
                 languageSelectionSheet
             }
+            .sheet(isPresented: $showingLoginSheet) {
+                LoginView()
+            }
             .alert(NSLocalizedString("settings.logout", comment: "Logout"), isPresented: $showingLogoutAlert) {
                 Button(NSLocalizedString("common.cancel", comment: "Cancel button"), role: .cancel) {}
                 Button(NSLocalizedString("settings.logout", comment: "Logout button"), role: .destructive) {
-                    // Handle logout
+                    authService.signOut()
                 }
             } message: {
                 Text(NSLocalizedString("settings.logout_confirmation", comment: "Logout confirmation message"))
@@ -116,25 +128,37 @@ struct SettingsView: View {
     // MARK: - Profile Section
     private var profileSection: some View {
         VStack {
-            Image(systemName: "person.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 80, height: 80)
-                .foregroundColor(.blue)
-                .overlay(
-                    Circle()
-                        .stroke(Color.blue.opacity(0.2), lineWidth: 4)
-                        .scaleEffect(animateBackground ? 1.1 : 1.0)
-                )
-                .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: animateBackground)
-            
-            Text(NSLocalizedString("profile.username", comment: "Username"))
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            Text(NSLocalizedString("profile.signature", comment: "User signature"))
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            if let user = authService.currentUser {
+                if let pictureUrl = user.picture {
+                    AsyncImage(url: pictureUrl) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 80, height: 80)
+                            .clipShape(Circle())
+                    } placeholder: {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 80, height: 80)
+                            .foregroundColor(.blue)
+                    }
+                } else {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 80, height: 80)
+                        .foregroundColor(.blue)
+                }
+                
+                Text(user.name)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text(user.email)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
         }
         .padding()
         .background(
@@ -142,6 +166,24 @@ struct SettingsView: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         )
+    }
+    
+    // MARK: - Login Button
+    private var loginButton: some View {
+        Button(action: { showingLoginSheet = true }) {
+            HStack {
+                Image(systemName: "person.fill.badge.plus")
+                    .foregroundColor(.blue)
+                Text(NSLocalizedString("settings.login", comment: "Login"))
+                    .foregroundColor(.blue)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.blue.opacity(0.1))
+            )
+        }
     }
     
     // MARK: - Settings Section

@@ -141,13 +141,15 @@
 
 // Settings
 "settings.title" = "Settings";
+"settings.login" = "Login";
+"settings.logout" = "Logout";
+"settings.logout_confirmation" = "Are you sure you want to logout?";
 "settings.dark_mode" = "Dark Mode";
 "settings.notifications" = "Enable Notifications";
 "settings.language" = "Language";
 "settings.version" = "Version";
 "settings.privacy_policy" = "Privacy Policy";
 "settings.terms" = "Terms of Service";
-"settings.logout" = "Logout";
 "settings.display" = "Display";
 "settings.enable_notifications" = "Enable Notifications";
 "settings.select_language" = "Select Language";
