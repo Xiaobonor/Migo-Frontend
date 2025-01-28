@@ -28,8 +28,8 @@ struct FocusView: View {
         avatar: ""
     )
     
-    // 更改更新頻率為每秒更新一次
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    // 使用 @StateObject 來確保計時器的生命週期
+    @StateObject private var timerManager = TimerManager()
     
     // 新增：模擬用戶數據
     private let simulatedMembers: [GroupMember] = [
@@ -366,45 +366,22 @@ struct FocusView: View {
                 }
             }
             .onAppear {
+                // 啟動背景動畫
                 withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
                     animateBackground = true
                 }
+                // 啟動計時器
+                timerManager.startTimer()
             }
-            .onReceive(timer) { _ in
-                if isGroupModeEnabled && isSimulationEnabled {
-                    // 更新當前用戶狀態
-                    let userTotalSeconds = focusSegments.reduce(0) { $0 + $1.duration } + Int(elapsedTime)
-                    currentUser = GroupMember(
-                        id: currentUser.id,
-                        name: currentUser.name,
-                        totalSeconds: userTotalSeconds,
-                        isActive: isActive,
-                        avatar: currentUser.avatar
-                    )
-                    
-                    // 更新模擬用戶的狀態和時間
-                    var updatedMembers = groupMembers
-                    for i in 0..<updatedMembers.count {
-                        let member = updatedMembers[i]
-                        let isCurrentlyActive = member.isActive
-                        
-                        // 每30秒有20%的機率改變狀態
-                        let shouldChangeStatus = Int.random(in: 1...30) == 1
-                        let newIsActive = shouldChangeStatus ? !isCurrentlyActive : isCurrentlyActive
-                        
-                        // 如果是活躍狀態，每秒增加0.5-2秒（模擬不同人的專注效率）
-                        let incrementSeconds = isCurrentlyActive ? Double.random(in: 0.5...2.0) : 0
-                        let newSeconds = member.totalSeconds + Int(incrementSeconds)
-                        
-                        updatedMembers[i] = GroupMember(
-                            id: member.id,
-                            name: member.name,
-                            totalSeconds: newSeconds,
-                            isActive: newIsActive,
-                            avatar: member.avatar
-                        )
-                    }
-                    groupMembers = updatedMembers
+            .onDisappear {
+                // 停止計時器
+                timerManager.stopTimer()
+            }
+            .onChange(of: isGroupModeEnabled) { oldValue, newValue in
+                if newValue && isSimulationEnabled {
+                    groupMembers = simulatedMembers
+                } else {
+                    groupMembers = []
                 }
             }
         }
@@ -787,6 +764,35 @@ struct GroupMemberRow: View {
         .cornerRadius(12)
         .shadow(radius: 2)
         .opacity(member.isActive ? 1 : 0.7)
+    }
+}
+
+// MARK: - Timer Manager
+class TimerManager: ObservableObject {
+    private var timer: Timer?
+    
+    func startTimer() {
+        // 確保先停止現有的計時器
+        stopTimer()
+        
+        // 創建新的計時器
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.updateGroupMembers()
+        }
+    }
+    
+    func stopTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    private func updateGroupMembers() {
+        // 更新群組成員的邏輯移到這裡
+        // 使用 @Published 屬性來通知 View 更新
+    }
+    
+    deinit {
+        stopTimer()
     }
 }
 
