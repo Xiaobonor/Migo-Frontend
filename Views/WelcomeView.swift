@@ -13,40 +13,49 @@ struct WelcomeView: View {
     @State private var animateButton = false
     @State private var animateLinks = false
     @State private var isButtonPressed = false
+    @State private var showSuccessTip = false
     
     // MARK: - Animation Properties
     private let backgroundAnimation = Animation.easeInOut(duration: 8).repeatForever(autoreverses: true)
-    private let springAnimation = Animation.easeInOut(duration: 0.6)
+    private let springAnimation = Animation.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8)
     
     // MARK: - Custom Button Style
     private var googleSignInButton: some View {
         Button {
             // 點擊動畫
-            withAnimation(.easeInOut(duration: 0.2)) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                 isButtonPressed = true
             }
             
             // 延遲執行登入操作，讓動畫有時間完成
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.easeInOut(duration: 0.2)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                     isButtonPressed = false
                 }
                 Task {
                     do {
                         // 開始登入動畫
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withAnimation(.easeInOut(duration: 0.5)) {
                             authService.isLoading = true
                         }
                         
                         await authService.signInWithGoogle()
                         
                         // 登入成功動畫
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8)) {
                             authService.isLoading = false
+                        }
+                        
+                        // 短暫的成功提示
+                        withAnimation(.easeInOut(duration: 0.3).delay(0.3)) {
+                            showSuccessTip = true
+                        }
+                        withAnimation(.easeInOut(duration: 0.3).delay(1.5)) {
+                            showSuccessTip = false
                         }
                     } catch {
                         // 登入失敗動畫
-                        withAnimation(.easeInOut(duration: 0.3)) {
+                        withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8)) {
                             authService.isLoading = false
                         }
                     }
@@ -105,7 +114,17 @@ struct WelcomeView: View {
         .disabled(authService.isLoading)
         .scaleEffect(animateButton ? 1 : 0.9)
         .opacity(animateButton ? 1 : 0)
-        .animation(.easeInOut(duration: 0.6).delay(0.9), value: animateButton)
+        .animation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8).delay(0.9), value: animateButton)
+        
+        // 成功提示
+        .overlay(alignment: .top) {
+            if showSuccessTip {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(.green)
+                    .transition(.opacity.combined(with: .scale))
+            }
+        }
         
         // 錯誤訊息
         .overlay(alignment: .bottom) {
@@ -121,7 +140,7 @@ struct WelcomeView: View {
                     )
                     .offset(y: 48)
                     .transition(.move(edge: .top).combined(with: .opacity))
-                    .animation(.easeInOut(duration: 0.8), value: error)
+                    .animation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8), value: error)
             }
         }
     }
