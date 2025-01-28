@@ -13,6 +13,28 @@
 "focus.join_group" = "加入小組";
 "focus.custom_time" = "自訂";
 "focus.select_time" = "選擇時間";
+"focus.circle_minutes" = "一圈 %d 分鐘";
+"focus.total_focus" = "總專注";
+"focus.focus_count" = "專注次數";
+"focus.minutes_unit" = "分鐘";
+"focus.times_unit" = "次";
+"focus.break.title" = "需要休息嗎？";
+"focus.break.message" = "您已經專注了 %d 分鐘";
+"focus.break.continue" = "繼續專注";
+"focus.break.start" = "開始休息";
+"focus.stats.title" = "專注統計";
+"focus.stats.today" = "今日統計";
+"focus.stats.total_time" = "總專注時間";
+"focus.stats.focus_count" = "專注次數";
+"focus.stats.average_duration" = "平均時長";
+"focus.stats.records" = "專注記錄";
+"focus.stats.focused_duration" = "專注了 %d 分鐘";
+"focus.time_settings.title" = "設定一圈時間";
+"focus.time_settings.minutes" = "%d 分鐘";
+"focus.time_settings.custom" = "自訂時間";
+"focus.time_settings.cancel" = "取消";
+"focus.time_settings.confirm" = "確定";
+"focus.toast.time_set" = "已設定為 %d 分鐘";
 
 // Focus Status and Buttons
 "focus.status.focusing" = "專注中";
@@ -29,6 +51,13 @@
 "focus.groups.study_group" = "讀書小組";
 "focus.groups.members_focusing" = "3人正在專注";
 "focus.groups.join" = "加入";
+
+// Focus Group Mode
+"focus.group.title" = "群組模式";
+"focus.group.members" = "群組成員";
+"focus.group.join" = "加入群組";
+"focus.group.leave" = "離開群組";
+"focus.group.active_members" = "活躍成員";
 
 // Diary View
 "diary.title" = "日記";
@@ -265,4 +294,9 @@
 // Welcome Messages
 "welcome.message.success" = "登入成功！";
 "welcome.message.error" = "登入失敗";
-"welcome.message.try_again" = "請重試"; 
+"welcome.message.try_again" = "請重試";
+
+// Loading View
+"loading.message" = "正在載入...";
+"loading.checking_auth" = "正在檢查登入狀態";
+"loading.preparing" = "正在準備應用程式"; 

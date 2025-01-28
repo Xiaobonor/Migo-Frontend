@@ -14,15 +14,15 @@ struct FocusView: View {
     @State private var focusSegments: [TimeSegment] = []
     @State private var currentSegmentStartTime: Date?
     @State private var showingStats = false
-    @State private var circleMinutes: Int = 25 // 一圈代表的分鐘數
+    @State private var circleMinutes: Int = 25
     @State private var showToast: Bool = false
     @State private var toastMessage: String = ""
-    @State private var isGroupModeEnabled: Bool = false // 新增：群組模式開關
+    @State private var isGroupModeEnabled: Bool = false
     @State private var groupMembers: [GroupMember] = []
-    @State private var isSimulationEnabled: Bool = true // 新增：模擬開關
+    @State private var isSimulationEnabled: Bool = true
     @State private var currentUser: GroupMember = GroupMember(
         id: UUID(),
-        name: "我",
+        name: NSLocalizedString("profile.default.name", comment: "Default user name"),
         totalSeconds: 0,
         isActive: false,
         avatar: ""
@@ -183,17 +183,17 @@ struct FocusView: View {
                                 .disabled(isActive)
                                 
                                 // Status Text
-                                Text(isActive ? "專注中" : "準備開始")
+                                Text(isActive ? NSLocalizedString("focus.status.focusing", comment: "Focusing status") : NSLocalizedString("focus.status.ready", comment: "Ready to start"))
                                     .font(.title3.weight(.medium))
                                     .foregroundColor(.secondary)
                                 
                                 if isActive {
-                                    Text("已專注 \(currentFocusDuration) 分鐘")
+                                    Text(String(format: NSLocalizedString("focus.break.message", comment: "Break message"), currentFocusDuration))
                                         .font(.subheadline.weight(.medium))
                                         .foregroundColor(.secondary)
                                         .opacity(0.8)
                                 } else if !focusSegments.isEmpty {
-                                    Text("一圈 \(circleMinutes) 分鐘")
+                                    Text(String(format: NSLocalizedString("focus.circle_minutes", comment: "Minutes per circle"), circleMinutes))
                                         .font(.subheadline.weight(.medium))
                                         .foregroundColor(.secondary)
                                         .opacity(0.8)
@@ -256,13 +256,13 @@ struct FocusView: View {
                         VStack(spacing: 20) {
                             HStack(spacing: 20) {
                                 StatCard(
-                                    title: "總專注",
-                                    value: "\(totalFocusTime)分鐘",
+                                    title: NSLocalizedString("focus.total_focus", comment: "Total focus time"),
+                                    value: String(format: "%d %@", totalFocusTime, NSLocalizedString("focus.minutes_unit", comment: "Minutes unit")),
                                     icon: "clock.fill"
                                 )
                                 StatCard(
-                                    title: "專注次數",
-                                    value: "\(focusSegments.count)次",
+                                    title: NSLocalizedString("focus.focus_count", comment: "Focus count"),
+                                    value: String(format: "%d %@", focusSegments.count, NSLocalizedString("focus.times_unit", comment: "Times unit")),
                                     icon: "number.circle.fill"
                                 )
                             }
@@ -290,7 +290,7 @@ struct FocusView: View {
                 }
                 .padding(.vertical, 30)
             }
-            .navigationTitle("專注")
+            .navigationTitle(NSLocalizedString("focus.title", comment: "Focus title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -303,7 +303,6 @@ struct FocusView: View {
                             .disabled(isActive)
                         }
                         
-                        // 修改：群組模式開關（移除點點）
                         Button(action: { 
                             isGroupModeEnabled.toggle()
                             if isGroupModeEnabled && isSimulationEnabled {
@@ -329,7 +328,7 @@ struct FocusView: View {
             }
             .sheet(isPresented: $showingTimeSettings) {
                 TimeSettingsView(circleMinutes: $circleMinutes) { newMinutes in
-                    toastMessage = "已設定為 \(newMinutes) 分鐘"
+                    toastMessage = String(format: NSLocalizedString("focus.toast.time_set", comment: "Time set message"), newMinutes)
                     withAnimation {
                         showToast = true
                     }
@@ -354,17 +353,17 @@ struct FocusView: View {
                         .padding(.top, 10)
                 }
             }
-            .alert("需要休息嗎？", isPresented: $showingBreakAlert) {
-                Button("繼續專注", role: .cancel) { }
-                Button("開始休息") { startBreak() }
+            .alert(NSLocalizedString("focus.break.title", comment: "Break alert title"), isPresented: $showingBreakAlert) {
+                Button(NSLocalizedString("focus.break.continue", comment: "Continue focus button"), role: .cancel) { }
+                Button(NSLocalizedString("focus.break.start", comment: "Start break button")) { startBreak() }
             } message: {
-                Text("您已經專注了 \(currentFocusDuration) 分鐘")
+                Text(String(format: NSLocalizedString("focus.break.message", comment: "Break message"), currentFocusDuration))
             }
-            .alert("確定要重置嗎？", isPresented: $showingResetAlert) {
-                Button("取消", role: .cancel) { }
-                Button("重置", role: .destructive) { resetAll() }
-            } message: {
-                Text("這將清除所有專注記錄")
+            .alert(NSLocalizedString("focus.time_settings.title", comment: "Time settings title"), isPresented: $showingResetAlert) {
+                Button(NSLocalizedString("focus.time_settings.cancel", comment: "Cancel button"), role: .cancel) { }
+                Button(NSLocalizedString("focus.time_settings.confirm", comment: "Confirm button"), role: .destructive) {
+                    resetAll()
+                }
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
@@ -373,7 +372,7 @@ struct FocusView: View {
             }
             .onReceive(timer) { _ in
                 if isGroupModeEnabled && isSimulationEnabled {
-                    // 更新當前用戶狀態 - 使用歷史記錄總時間加上當前專注時間
+                    // 更新當前用戶狀態
                     let userTotalSeconds = focusSegments.reduce(0) { $0 + $1.duration } + Int(elapsedTime)
                     currentUser = GroupMember(
                         id: currentUser.id,
@@ -411,30 +410,51 @@ struct FocusView: View {
         }
     }
     
+    // MARK: - Supporting Views
+    struct StatCard: View {
+        let title: String
+        let value: String
+        let icon: String
+        
+        var body: some View {
+            VStack(spacing: 8) {
+                HStack {
+                    Image(systemName: icon)
+                        .foregroundColor(.blue)
+                    Text(title)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                Text(value)
+                    .font(.title3.bold())
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(15)
+            .shadow(radius: 2)
+        }
+    }
+    
     // MARK: - Methods
     private func toggleTimer() {
         withAnimation {
+            isActive.toggle()
             if isActive {
-                // 暫停計時
+                startTime = Date()
+                currentSegmentStartTime = startTime
+            } else {
                 if let start = currentSegmentStartTime {
                     let segment = TimeSegment(
                         startTime: start,
                         endTime: Date(),
-                        duration: Int(Date().timeIntervalSince(start))
+                        duration: Int(elapsedTime)
                     )
                     focusSegments.append(segment)
                 }
                 startTime = nil
                 currentSegmentStartTime = nil
-            } else {
-                // 開始計時
-                startTime = Date()
-                currentSegmentStartTime = Date()
-                if elapsedTime == 0 {
-                    focusSegments = [] // 如果是重新開始，清空之前的記錄
-                }
             }
-            isActive.toggle()
         }
     }
     
@@ -443,10 +463,11 @@ struct FocusView: View {
             let segment = TimeSegment(
                 startTime: start,
                 endTime: Date(),
-                duration: Int(Date().timeIntervalSince(start))
+                duration: Int(elapsedTime)
             )
             focusSegments.append(segment)
         }
+        
         withAnimation {
             isActive = false
             startTime = nil
@@ -462,7 +483,6 @@ struct FocusView: View {
     private func resetAll() {
         withAnimation {
             if isActive {
-                // 如果正在計時，先停止
                 toggleTimer()
             }
             focusSegments = []
@@ -479,67 +499,6 @@ struct TimeSegment: Identifiable {
     let startTime: Date
     let endTime: Date
     let duration: Int // 秒
-}
-
-// MARK: - Focus Segment Card
-struct FocusSegmentCard: View {
-    let segment: TimeSegment
-    
-    private var durationText: String {
-        let minutes = segment.duration / 60
-        return "\(minutes)分鐘"
-    }
-    
-    private var timeText: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return "\(formatter.string(from: segment.startTime)) - \(formatter.string(from: segment.endTime))"
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(durationText)
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            Text(timeText)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(15)
-        .shadow(radius: 2)
-    }
-}
-
-// MARK: - Stat Card
-struct StatCard: View {
-    let title: String
-    let value: String
-    let icon: String
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(.blue)
-                Text(title)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(15)
-        .shadow(radius: 2)
-    }
 }
 
 // MARK: - Focus Stats View
@@ -559,23 +518,26 @@ struct FocusStatsView: View {
     var body: some View {
         NavigationView {
             List {
-                Section("今日統計") {
-                    StatRow(title: "總專注時間", value: "\(totalFocusTime) 分鐘")
-                    StatRow(title: "專注次數", value: "\(segments.count) 次")
-                    StatRow(title: "平均時長", value: "\(averageFocusTime) 分鐘")
+                Section(NSLocalizedString("focus.stats.today", comment: "Today's stats")) {
+                    StatRow(title: NSLocalizedString("focus.stats.total_time", comment: "Total focus time"),
+                           value: String(format: "%d %@", totalFocusTime, NSLocalizedString("focus.minutes_unit", comment: "Minutes unit")))
+                    StatRow(title: NSLocalizedString("focus.stats.focus_count", comment: "Focus count"),
+                           value: String(format: "%d %@", segments.count, NSLocalizedString("focus.times_unit", comment: "Times unit")))
+                    StatRow(title: NSLocalizedString("focus.stats.average_duration", comment: "Average duration"),
+                           value: String(format: "%d %@", averageFocusTime, NSLocalizedString("focus.minutes_unit", comment: "Minutes unit")))
                 }
                 
-                Section("專注記錄") {
+                Section(NSLocalizedString("focus.stats.records", comment: "Focus records")) {
                     ForEach(segments.reversed()) { segment in
                         FocusSegmentRow(segment: segment)
                     }
                 }
             }
-            .navigationTitle("專注統計")
+            .navigationTitle(NSLocalizedString("focus.stats.title", comment: "Focus statistics"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("完成") { dismiss() }
+                    Button(NSLocalizedString("common.done", comment: "Done button")) { dismiss() }
                 }
             }
         }
@@ -611,11 +573,79 @@ struct FocusSegmentRow: View {
             Text("\(timeFormatter.string(from: segment.startTime)) - \(timeFormatter.string(from: segment.endTime))")
                 .font(.subheadline)
             
-            Text("專注了 \(segment.duration / 60) 分鐘")
+            Text(String(format: NSLocalizedString("focus.stats.focused_duration", comment: "Focused duration"), segment.duration / 60))
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
         .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Time Settings View
+struct TimeSettingsView: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var circleMinutes: Int
+    @State private var tempMinutes: Int
+    let onTimeSelected: (Int) -> Void
+    
+    private let presetMinutes = [15, 25, 30, 45, 60]
+    
+    init(circleMinutes: Binding<Int>, onTimeSelected: @escaping (Int) -> Void = { _ in }) {
+        self._circleMinutes = circleMinutes
+        self._tempMinutes = State(initialValue: circleMinutes.wrappedValue)
+        self.onTimeSelected = onTimeSelected
+    }
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text(NSLocalizedString("focus.time_settings.title", comment: "Time settings title"))
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                
+                // 預設時間選項
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(presetMinutes, id: \.self) { minutes in
+                            Button(action: { tempMinutes = minutes }) {
+                                Text(String(format: NSLocalizedString("focus.time_settings.minutes", comment: "Minutes format"), minutes))
+                                    .font(.subheadline)
+                                    .foregroundColor(tempMinutes == minutes ? .white : .blue)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        Capsule()
+                                            .fill(tempMinutes == minutes ? Color.blue : Color.blue.opacity(0.1))
+                                    )
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+                // 自定義時間選擇器
+                Picker("", selection: $tempMinutes) {
+                    ForEach(1...120, id: \.self) { minute in
+                        Text(String(format: NSLocalizedString("focus.time_settings.minutes", comment: "Minutes format"), minute)).tag(minute)
+                    }
+                }
+                .pickerStyle(.wheel)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(NSLocalizedString("focus.time_settings.cancel", comment: "Cancel button")) { dismiss() }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(NSLocalizedString("focus.time_settings.confirm", comment: "Confirm button")) {
+                        circleMinutes = tempMinutes
+                        onTimeSelected(tempMinutes)
+                        dismiss()
+                    }
+                    .fontWeight(.bold)
+                }
+            }
+        }
     }
 }
 
@@ -671,74 +701,6 @@ struct GroupRowView: View {
             .foregroundColor(.blue)
         }
         .padding(.vertical, 8)
-    }
-}
-
-// MARK: - Time Settings View
-struct TimeSettingsView: View {
-    @Environment(\.dismiss) var dismiss
-    @Binding var circleMinutes: Int
-    @State private var tempMinutes: Int
-    let onTimeSelected: (Int) -> Void
-    
-    private let presetMinutes = [15, 25, 30, 45, 60]
-    
-    init(circleMinutes: Binding<Int>, onTimeSelected: @escaping (Int) -> Void = { _ in }) {
-        self._circleMinutes = circleMinutes
-        self._tempMinutes = State(initialValue: circleMinutes.wrappedValue)
-        self.onTimeSelected = onTimeSelected
-    }
-    
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Text("設定一圈時間")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                
-                // 預設時間選項
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(presetMinutes, id: \.self) { minutes in
-                            Button(action: { tempMinutes = minutes }) {
-                                Text("\(minutes)分鐘")
-                                    .font(.subheadline)
-                                    .foregroundColor(tempMinutes == minutes ? .white : .blue)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 8)
-                                    .background(
-                                        Capsule()
-                                            .fill(tempMinutes == minutes ? Color.blue : Color.blue.opacity(0.1))
-                                    )
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-                
-                // 自定義時間選擇器
-                Picker("", selection: $tempMinutes) {
-                    ForEach(1...120, id: \.self) { minute in
-                        Text("\(minute) 分鐘").tag(minute)
-                    }
-                }
-                .pickerStyle(.wheel)
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("取消") { dismiss() }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("確定") {
-                        circleMinutes = tempMinutes
-                        onTimeSelected(tempMinutes)
-                        dismiss()
-                    }
-                    .fontWeight(.bold)
-                }
-            }
-        }
     }
 }
 

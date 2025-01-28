@@ -6,11 +6,14 @@ struct ContentView: View {
     @AppStorage("isDarkMode") private var isDarkMode = false
     @AppStorage("language") private var language = "zh-Hant"
     @StateObject private var authService = AuthenticationService.shared
+    @State private var isLoading = true
     
     // MARK: - Body
     var body: some View {
         Group {
-            if authService.isAuthenticated {
+            if isLoading {
+                LoadingView()
+            } else if authService.isAuthenticated {
                 mainView
             } else {
                 WelcomeView()
@@ -26,9 +29,15 @@ struct ContentView: View {
         } message: {
             Text(authService.error ?? NSLocalizedString("auth.session_expired.message", comment: "Session expired message"))
         }
-        .onAppear {
+        .task {
+            // 檢查登入狀態
             if authService.isAuthenticated {
-                authService.validateSession()
+                await authService.validateSession()
+            }
+            // 延遲一小段時間以展示載入動畫
+            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 秒
+            withAnimation(.easeInOut(duration: 0.3)) {
+                isLoading = false
             }
         }
     }

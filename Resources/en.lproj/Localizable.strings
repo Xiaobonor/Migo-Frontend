@@ -13,6 +13,28 @@
 "focus.join_group" = "Join Group";
 "focus.custom_time" = "Custom";
 "focus.select_time" = "Select Time";
+"focus.circle_minutes" = "%d minutes per circle";
+"focus.total_focus" = "Total Focus";
+"focus.focus_count" = "Focus Count";
+"focus.minutes_unit" = "min";
+"focus.times_unit" = "times";
+"focus.break.title" = "Need a Break?";
+"focus.break.message" = "You've focused for %d minutes";
+"focus.break.continue" = "Continue Focus";
+"focus.break.start" = "Take a Break";
+"focus.stats.title" = "Focus Statistics";
+"focus.stats.today" = "Today's Stats";
+"focus.stats.total_time" = "Total Focus Time";
+"focus.stats.focus_count" = "Focus Count";
+"focus.stats.average_duration" = "Average Duration";
+"focus.stats.records" = "Focus Records";
+"focus.stats.focused_duration" = "Focused for %d minutes";
+"focus.time_settings.title" = "Set Circle Duration";
+"focus.time_settings.minutes" = "%d minutes";
+"focus.time_settings.custom" = "Custom Duration";
+"focus.time_settings.cancel" = "Cancel";
+"focus.time_settings.confirm" = "Confirm";
+"focus.toast.time_set" = "Set to %d minutes";
 
 // Focus Status and Buttons
 "focus.status.focusing" = "Focusing";
@@ -30,7 +52,7 @@
 "focus.groups.members_focusing" = "3 Members Focusing";
 "focus.groups.join" = "Join";
 
-// Diary View
+// Group View
 "diary.title" = "Diary";
 "diary.quick_note" = "Quick Note";
 "diary.new_diary" = "New Diary";
@@ -266,4 +288,16 @@
 // Welcome Messages
 "welcome.message.success" = "Successfully signed in!";
 "welcome.message.error" = "Failed to sign in";
-"welcome.message.try_again" = "Please try again"; 
+"welcome.message.try_again" = "Please try again";
+
+// Focus Group Mode
+"focus.group.title" = "Group Mode";
+"focus.group.members" = "Group Members";
+"focus.group.join" = "Join Group";
+"focus.group.leave" = "Leave Group";
+"focus.group.active_members" = "Active Members";
+
+// Loading View
+"loading.message" = "Loading...";
+"loading.checking_auth" = "Checking authentication";
+"loading.preparing" = "Preparing application"; 
