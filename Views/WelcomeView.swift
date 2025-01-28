@@ -13,7 +13,6 @@ struct WelcomeView: View {
     @State private var animateButton = false
     @State private var animateLinks = false
     @State private var isButtonPressed = false
-    @State private var showSuccessTip = false
     
     // MARK: - Animation Properties
     private let backgroundAnimation = Animation.easeInOut(duration: 8).repeatForever(autoreverses: true)
@@ -44,14 +43,6 @@ struct WelcomeView: View {
                         // 登入成功動畫
                         withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8)) {
                             authService.isLoading = false
-                        }
-                        
-                        // 短暫的成功提示
-                        withAnimation(.easeInOut(duration: 0.3).delay(0.3)) {
-                            showSuccessTip = true
-                        }
-                        withAnimation(.easeInOut(duration: 0.3).delay(1.5)) {
-                            showSuccessTip = false
                         }
                     } catch {
                         // 登入失敗動畫
@@ -92,7 +83,12 @@ struct WelcomeView: View {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
                         .scaleEffect(1.2)
-                        .transition(.opacity.combined(with: .scale))
+                        .transition(
+                            .asymmetric(
+                                insertion: .opacity.combined(with: .scale(scale: 1.1)),
+                                removal: .opacity.combined(with: .scale(scale: 0.9))
+                            )
+                        )
                 } else {
                     // 按鈕內容
                     HStack(spacing: 12) {
@@ -103,7 +99,12 @@ struct WelcomeView: View {
                             .font(.system(size: 17, weight: .medium, design: .rounded))
                     }
                     .foregroundColor(.black)
-                    .transition(.opacity.combined(with: .scale))
+                    .transition(
+                        .asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 1.1)),
+                            removal: .opacity.combined(with: .scale(scale: 0.9))
+                        )
+                    )
                 }
             }
             .frame(width: UIScreen.main.bounds.width - 48, height: 56)
@@ -115,16 +116,6 @@ struct WelcomeView: View {
         .scaleEffect(animateButton ? 1 : 0.9)
         .opacity(animateButton ? 1 : 0)
         .animation(.interactiveSpring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.8).delay(0.9), value: animateButton)
-        
-        // 成功提示
-        .overlay(alignment: .top) {
-            if showSuccessTip {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(.green)
-                    .transition(.opacity.combined(with: .scale))
-            }
-        }
         
         // 錯誤訊息
         .overlay(alignment: .bottom) {
