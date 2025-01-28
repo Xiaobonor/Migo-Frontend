@@ -66,10 +66,8 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Profile Section
-                        if authService.isAuthenticated {
-                            profileSection
-                                .transition(.scale.combined(with: .opacity))
-                        }
+                        profileSection
+                            .transition(.scale.combined(with: .opacity))
                         
                         // Main Settings
                         settingsSection
@@ -148,6 +146,20 @@ struct SettingsView: View {
                     .fontWeight(.bold)
                 
                 Text(user.email)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
+                    .foregroundColor(.gray)
+                
+                Text("尚未登入")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text("登入以使用完整功能")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

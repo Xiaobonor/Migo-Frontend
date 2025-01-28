@@ -196,8 +196,74 @@
 "common.done" = "Done";
 "common.create" = "Create";
 "common.ok" = "OK";
+"common.close" = "Close";
 
 // Language Names
 "language.zh_hant" = "Traditional Chinese";
 "language.en" = "English";
-"language.ja" = "Japanese"; 
+"language.ja" = "Japanese";
+
+// Welcome View
+"welcome.title" = "Welcome to Migo";
+"welcome.subtitle" = "Start Your Learning Journey";
+"welcome.login.google" = "Continue with Google";
+"welcome.privacy_policy" = "Privacy Policy";
+"welcome.terms" = "Terms of Service";
+
+// Authentication Errors
+"auth.error.google_signin" = "Failed to sign in with Google. Please try again.";
+"auth.error.unknown" = "An unexpected error occurred. Please try again.";
+"auth.error.token_missing" = "Login credentials are invalid. Please sign in again.";
+"auth.error.token_expired" = "Your login session has expired. Please sign in again.";
+"auth.error.network" = "Network connection error. Please check your internet connection.";
+"auth.error.canceled" = "Sign in was canceled.";
+"auth.error.invalid_token" = "Invalid authentication token. Please try again.";
+"auth.error.decoding" = "Error processing user data. Please try again.";
+"auth.error.internal" = "Internal error occurred. Please try again.";
+"auth.error.enterprise" = "Enterprise account sign in error. Please contact administrator.";
+"auth.error.no_saved_auth" = "No saved authentication information found.";
+"auth.error.keychain" = "System keychain access error.";
+"auth.error.no_user" = "No user information found.";
+"auth.error.scope_not_granted" = "Required permissions not granted.";
+"auth.error.server" = "Server error. Please try again later.";
+"auth.error.sign_in_in_progress" = "Sign in is already in progress.";
+"auth.session_expired.title" = "Session Expired";
+"auth.session_expired.message" = "Your login session has expired. Please sign in again.";
+
+// Authentication Messages
+"auth.error.profile_fetch" = "Failed to fetch user profile";
+"auth.error.session_expired" = "Your session has expired";
+"auth.message.logging_in" = "Signing in...";
+"auth.message.restoring_session" = "Restoring session...";
+"auth.message.session_restored" = "Session restored successfully";
+"auth.message.logged_out" = "Signed out successfully";
+"auth.message.token_updated" = "Authentication token updated";
+
+// User Profile
+"profile.default.name" = "Guest";
+"profile.default.email" = "Not signed in";
+"profile.default.bio" = "No bio available";
+"profile.image.dimension" = "200";
+"profile.status.active" = "Active";
+"profile.status.inactive" = "Inactive";
+
+// Debug Messages
+"debug.error.top_vc_missing" = "Could not get top view controller";
+"debug.error.no_id_token" = "No ID token received from Google Sign In";
+"debug.success.id_token" = "Successfully received ID token from Google";
+"debug.success.user_data" = "Successfully created user data";
+"debug.success.decode" = "Successfully decoded user data";
+"debug.error.decode" = "Error decoding user data";
+"debug.success.signin" = "Successfully completed Google Sign In process";
+"debug.error.signin" = "Google Sign In Error";
+
+// Validation Messages
+"validation.token.missing" = "Authentication token is missing";
+"validation.token.invalid" = "Authentication token is invalid";
+"validation.token.expired" = "Authentication token has expired";
+"validation.session.invalid" = "Invalid session";
+
+// Welcome Messages
+"welcome.message.success" = "Successfully signed in!";
+"welcome.message.error" = "Failed to sign in";
+"welcome.message.try_again" = "Please try again"; 

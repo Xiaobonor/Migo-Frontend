@@ -3,7 +3,7 @@
 "tab.diary" = "日記";
 "tab.group" = "小組";
 "tab.goals" = "目標";
-"tab.profile" = "我的";
+"tab.profile" = "個人";
 
 // Focus View
 "focus.title" = "專注";
@@ -124,7 +124,7 @@
 "goals.completion_reminder" = "完成提醒";
 
 // Profile View
-"profile.title" = "我的";
+"profile.title" = "個人";
 "profile.settings" = "設置";
 "profile.achievements" = "我的成就";
 "profile.data" = "數據報告";
@@ -196,8 +196,73 @@
 "common.done" = "完成";
 "common.create" = "創建";
 "common.ok" = "確定";
+"common.close" = "關閉";
 
 // Language Names
 "language.zh_hant" = "繁體中文";
 "language.en" = "English";
-"language.ja" = "日本語"; 
+"language.ja" = "日本語";
+
+// Welcome View
+"welcome.title" = "歡迎來到 Migo";
+"welcome.subtitle" = "開始你的學習之旅";
+"welcome.login.google" = "使用 Google 繼續";
+"welcome.privacy_policy" = "隱私政策";
+"welcome.terms" = "服務條款";
+
+// Authentication Errors
+"auth.error.google_signin" = "Google 登入失敗，請重試";
+"auth.error.unknown" = "發生未預期的錯誤，請重試";
+"auth.error.token_missing" = "登入憑證無效，請重新登入";
+"auth.error.token_expired" = "登入階段已過期，請重新登入";
+"auth.error.canceled" = "已取消登入";
+"auth.error.invalid_token" = "驗證令牌無效，請重試";
+"auth.error.decoding" = "處理用戶資料時發生錯誤，請重試";
+"auth.error.internal" = "內部錯誤，請重試";
+"auth.error.enterprise" = "企業帳戶登入錯誤，請聯繫管理員";
+"auth.error.no_saved_auth" = "找不到已保存的登入資訊";
+"auth.error.keychain" = "系統金鑰鏈存取錯誤";
+"auth.error.no_user" = "找不到使用者資訊";
+"auth.error.scope_not_granted" = "未授予必要的權限";
+"auth.error.server" = "伺服器錯誤，請稍後再試";
+"auth.error.sign_in_in_progress" = "登入程序正在進行中";
+"auth.session_expired.title" = "登入階段已過期";
+"auth.session_expired.message" = "您的登入階段已過期，請重新登入";
+
+// Authentication Messages
+"auth.error.profile_fetch" = "無法取得使用者資料";
+"auth.error.session_expired" = "您的登入階段已過期";
+"auth.message.logging_in" = "登入中...";
+"auth.message.restoring_session" = "正在恢復登入狀態...";
+"auth.message.session_restored" = "已成功恢復登入狀態";
+"auth.message.logged_out" = "已成功登出";
+"auth.message.token_updated" = "已更新驗證令牌";
+
+// User Profile
+"profile.default.name" = "訪客";
+"profile.default.email" = "尚未登入";
+"profile.default.bio" = "尚無個人簡介";
+"profile.image.dimension" = "200";
+"profile.status.active" = "使用中";
+"profile.status.inactive" = "未使用";
+
+// Debug Messages
+"debug.error.top_vc_missing" = "無法取得頂層視圖控制器";
+"debug.error.no_id_token" = "未收到 Google 登入令牌";
+"debug.success.id_token" = "已成功收到 Google 登入令牌";
+"debug.success.user_data" = "已成功建立使用者資料";
+"debug.success.decode" = "已成功解析使用者資料";
+"debug.error.decode" = "解析使用者資料時發生錯誤";
+"debug.success.signin" = "Google 登入程序已成功完成";
+"debug.error.signin" = "Google 登入錯誤";
+
+// Validation Messages
+"validation.token.missing" = "缺少驗證令牌";
+"validation.token.invalid" = "驗證令牌無效";
+"validation.token.expired" = "驗證令牌已過期";
+"validation.session.invalid" = "無效的登入階段";
+
+// Welcome Messages
+"welcome.message.success" = "登入成功！";
+"welcome.message.error" = "登入失敗";
+"welcome.message.try_again" = "請重試"; 
