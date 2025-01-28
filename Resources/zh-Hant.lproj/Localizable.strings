@@ -271,6 +271,13 @@
 
 // Authentication Alerts
 "auth.alert.session_expired.title" = "登入階段已過期";
+"auth.alert.session_expired.message" = "請重新登入以繼續使用";
+"auth.alert.token_refresh.title" = "更新登入狀態";
+"auth.alert.token_refresh.message" = "正在更新您的登入狀態，請稍候...";
+"auth.alert.network_error.title" = "網路錯誤";
+"auth.alert.network_error.message" = "請檢查網路連接後重試";
+"auth.alert.server_error.title" = "伺服器錯誤";
+"auth.alert.server_error.message" = "伺服器暫時無法回應，請稍後再試";
 
 // User Profile
 "profile.default.name" = "訪客";

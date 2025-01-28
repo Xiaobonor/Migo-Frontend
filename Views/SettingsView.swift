@@ -67,23 +67,18 @@ struct SettingsView: View {
                     VStack(spacing: 24) {
                         // Profile Section
                         profileSection
-                            .transition(.scale.combined(with: .opacity))
                         
                         // Main Settings
                         settingsSection
-                            .transition(.scale.combined(with: .opacity))
                         
                         // About Section
                         aboutSection
-                            .transition(.scale.combined(with: .opacity))
                         
                         // Login/Logout Button
                         if authService.isAuthenticated {
                             logoutButton
-                                .transition(.scale.combined(with: .opacity))
                         } else {
                             loginButton
-                                .transition(.scale.combined(with: .opacity))
                         }
                     }
                     .padding()
@@ -103,6 +98,11 @@ struct SettingsView: View {
                 Button(NSLocalizedString("common.cancel", comment: "Cancel button"), role: .cancel) {}
                 Button(NSLocalizedString("settings.logout", comment: "Logout button"), role: .destructive) {
                     authService.signOut()
+                    
+                    // 等待登出動畫完成
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        authService.handleSignOutAnimationComplete()
+                    }
                 }
             } message: {
                 Text(NSLocalizedString("settings.logout_confirmation", comment: "Logout confirmation message"))
@@ -114,12 +114,20 @@ struct SettingsView: View {
             } message: {
                 Text(NSLocalizedString("settings.restart_required", comment: "Restart required message"))
             }
-            .onAppear {
-                withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
-                    animateBackground = true
-                }
+        }
+        .onAppear {
+            // 設置登出時關閉彈出視窗的回調
+            authService.onClosePopup = {
+                dismiss()
             }
-            .preferredColorScheme(isDarkMode ? .dark : .light)
+            
+            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                animateBackground = true
+            }
+        }
+        .onDisappear {
+            // 清除回調避免記憶體洩漏
+            authService.onClosePopup = nil
         }
     }
     
@@ -172,34 +180,16 @@ struct SettingsView: View {
         )
     }
     
-    // MARK: - Login Button
-    private var loginButton: some View {
-        Button(action: { showingLoginSheet = true }) {
-            HStack {
-                Image(systemName: "person.fill.badge.plus")
-                    .foregroundColor(.blue)
-                Text(NSLocalizedString("settings.login", comment: "Login"))
-                    .foregroundColor(.blue)
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(Color.blue.opacity(0.1))
-            )
-        }
-    }
-    
     // MARK: - Settings Section
     private var settingsSection: some View {
         VStack(spacing: 16) {
-            settingsCard(
+            SettingsCard(
                 title: NSLocalizedString("settings.display", comment: "Display settings"),
                 icon: "paintbrush.fill",
                 color: .blue
             ) {
                 // Dark Mode Toggle
-                settingsRow(
+                SettingsRow(
                     title: NSLocalizedString("settings.dark_mode", comment: "Dark mode"),
                     icon: "moon.fill",
                     color: .purple
@@ -207,10 +197,9 @@ struct SettingsView: View {
                     Toggle("", isOn: $isDarkMode)
                         .labelsHidden()
                 }
-                .matchedGeometryEffect(id: "darkMode", in: animation)
                 
                 // Language Selection
-                settingsRow(
+                SettingsRow(
                     title: NSLocalizedString("settings.language", comment: "Language"),
                     icon: "globe",
                     color: .green,
@@ -227,15 +216,14 @@ struct SettingsView: View {
                         showingLanguageSheet = true
                     }
                 }
-                .matchedGeometryEffect(id: "language", in: animation)
             }
             
-            settingsCard(
+            SettingsCard(
                 title: NSLocalizedString("settings.notifications", comment: "Notifications"),
                 icon: "bell.fill",
                 color: .red
             ) {
-                settingsRow(
+                SettingsRow(
                     title: NSLocalizedString("settings.enable_notifications", comment: "Enable notifications"),
                     icon: "bell.badge.fill",
                     color: .red,
@@ -250,13 +238,13 @@ struct SettingsView: View {
     
     // MARK: - About Section
     private var aboutSection: some View {
-        settingsCard(
+        SettingsCard(
             title: NSLocalizedString("settings.about", comment: "About"),
             icon: "info.circle.fill",
             color: .orange
         ) {
             NavigationLink(destination: LegalDocumentView(documentType: .privacyPolicy)) {
-                settingsRow(
+                SettingsRow(
                     title: NSLocalizedString("settings.privacy_policy", comment: "Privacy policy"),
                     icon: "lock.fill",
                     color: .blue
@@ -269,7 +257,7 @@ struct SettingsView: View {
             .buttonStyle(PlainButtonStyle())
             
             NavigationLink(destination: LegalDocumentView(documentType: .terms)) {
-                settingsRow(
+                SettingsRow(
                     title: NSLocalizedString("settings.terms", comment: "Terms of service"),
                     icon: "doc.text.fill",
                     color: .green
@@ -281,7 +269,7 @@ struct SettingsView: View {
             }
             .buttonStyle(PlainButtonStyle())
             
-            settingsRow(
+            SettingsRow(
                 title: NSLocalizedString("settings.version", comment: "Version"),
                 icon: "number.circle.fill",
                 color: .purple,
@@ -290,6 +278,24 @@ struct SettingsView: View {
                 Text("1.0.0")
                     .foregroundColor(.secondary)
             }
+        }
+    }
+    
+    // MARK: - Login Button
+    private var loginButton: some View {
+        Button(action: { showingLoginSheet = true }) {
+            HStack {
+                Image(systemName: "person.fill.badge.plus")
+                    .foregroundColor(.blue)
+                Text(NSLocalizedString("settings.login", comment: "Login"))
+                    .foregroundColor(.blue)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.blue.opacity(0.1))
+            )
         }
     }
     
@@ -341,14 +347,28 @@ struct SettingsView: View {
             })
         }
     }
+}
+
+// MARK: - Settings Card
+struct SettingsCard<Content: View>: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let content: Content
     
-    // MARK: - Helper Views
-    private func settingsCard<Content: View>(
+    init(
         title: String,
         icon: String,
         color: Color,
-        @ViewBuilder content: @escaping () -> Content
-    ) -> some View {
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.icon = icon
+        self.color = color
+        self.content = content()
+    }
+    
+    var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Image(systemName: icon)
@@ -358,7 +378,7 @@ struct SettingsView: View {
             }
             .padding(.horizontal)
             
-            content()
+            content
         }
         .padding(.vertical)
         .background(
@@ -367,14 +387,31 @@ struct SettingsView: View {
                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         )
     }
+}
+
+// MARK: - Settings Row
+struct SettingsRow<Content: View>: View {
+    let title: String
+    let icon: String
+    let color: Color
+    let showDivider: Bool
+    let content: Content
     
-    private func settingsRow<Content: View>(
+    init(
         title: String,
         icon: String,
         color: Color,
         showDivider: Bool = true,
-        @ViewBuilder content: @escaping () -> Content
-    ) -> some View {
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.icon = icon
+        self.color = color
+        self.showDivider = showDivider
+        self.content = content()
+    }
+    
+    var body: some View {
         VStack(spacing: 0) {
             HStack {
                 Image(systemName: icon)
@@ -385,7 +422,7 @@ struct SettingsView: View {
                 
                 Spacer()
                 
-                content()
+                content
             }
             .padding(.horizontal)
             .padding(.vertical, 12)

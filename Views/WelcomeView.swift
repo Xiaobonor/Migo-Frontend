@@ -16,19 +16,19 @@ struct WelcomeView: View {
     
     // MARK: - Animation Properties
     private let backgroundAnimation = Animation.easeInOut(duration: 8).repeatForever(autoreverses: true)
-    private let springAnimation = Animation.spring(response: 0.6, dampingFraction: 0.7)
+    private let springAnimation = Animation.easeInOut(duration: 0.6)
     
     // MARK: - Custom Button Style
     private var googleSignInButton: some View {
         Button {
             // 點擊動畫
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            withAnimation(.easeInOut(duration: 0.2)) {
                 isButtonPressed = true
             }
             
             // 延遲執行登入操作，讓動畫有時間完成
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                withAnimation(.easeInOut(duration: 0.2)) {
                     isButtonPressed = false
                 }
                 Task {
@@ -41,12 +41,12 @@ struct WelcomeView: View {
                         await authService.signInWithGoogle()
                         
                         // 登入成功動畫
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
                             authService.isLoading = false
                         }
                     } catch {
                         // 登入失敗動畫
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                        withAnimation(.easeInOut(duration: 0.3)) {
                             authService.isLoading = false
                         }
                     }
@@ -98,14 +98,14 @@ struct WelcomeView: View {
                 }
             }
             .frame(width: UIScreen.main.bounds.width - 48, height: 56)
-            .scaleEffect(isButtonPressed ? 0.97 : 1)
-            .scaleEffect(authService.isLoading ? 0.98 : 1)
+            .scaleEffect(isButtonPressed ? 0.98 : 1)
+            .scaleEffect(authService.isLoading ? 0.99 : 1)
             .opacity(authService.isLoading ? 0.8 : 1)
         }
         .disabled(authService.isLoading)
-        .scaleEffect(animateButton ? 1 : 0.8)
+        .scaleEffect(animateButton ? 1 : 0.9)
         .opacity(animateButton ? 1 : 0)
-        .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.9), value: animateButton)
+        .animation(.easeInOut(duration: 0.6).delay(0.9), value: animateButton)
         
         // 錯誤訊息
         .overlay(alignment: .bottom) {
@@ -121,7 +121,7 @@ struct WelcomeView: View {
                     )
                     .offset(y: 48)
                     .transition(.move(edge: .top).combined(with: .opacity))
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: error)
+                    .animation(.easeInOut(duration: 0.8), value: error)
             }
         }
     }
@@ -207,7 +207,7 @@ struct WelcomeView: View {
                             .symbolEffect(.bounce, options: .repeating)
                             .scaleEffect(animateLogo ? 1 : 0.5)
                             .opacity(animateLogo ? 1 : 0)
-                            .animation(springAnimation.delay(0.3), value: animateLogo)
+                            .animation(.easeInOut(duration: 0.8).delay(0.3), value: animateLogo)
                     }
                     
                     VStack(spacing: 12) {
@@ -217,7 +217,7 @@ struct WelcomeView: View {
                             .foregroundColor(AppColors.text)
                             .offset(y: animateTitle ? 0 : 20)
                             .opacity(animateTitle ? 1 : 0)
-                            .animation(springAnimation.delay(0.5), value: animateTitle)
+                            .animation(.easeInOut(duration: 0.8).delay(0.5), value: animateTitle)
                         
                         // 副標題
                         Text(NSLocalizedString("welcome.subtitle", comment: ""))
@@ -225,7 +225,7 @@ struct WelcomeView: View {
                             .foregroundColor(AppColors.textSecondary)
                             .offset(y: animateSubtitle ? 0 : 20)
                             .opacity(animateSubtitle ? 1 : 0)
-                            .animation(springAnimation.delay(0.7), value: animateSubtitle)
+                            .animation(.easeInOut(duration: 0.8).delay(0.7), value: animateSubtitle)
                     }
                 }
                 .padding(.bottom, 60)
@@ -256,7 +256,7 @@ struct WelcomeView: View {
                 .padding(.bottom, 16)
                 .offset(y: animateLinks ? 0 : 20)
                 .opacity(animateLinks ? 1 : 0)
-                .animation(springAnimation.delay(1.1), value: animateLinks)
+                .animation(.easeInOut(duration: 0.8).delay(1.1), value: animateLinks)
             }
         }
         .sheet(isPresented: $showingPrivacyPolicy) {

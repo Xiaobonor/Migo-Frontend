@@ -1,7 +1,6 @@
 import Foundation
 import GoogleSignIn
 import GoogleSignInSwift
-import SwiftUI
 
 class AuthenticationService: ObservableObject {
     static let shared = AuthenticationService()
@@ -11,6 +10,12 @@ class AuthenticationService: ObservableObject {
     @Published var error: String?
     @Published var shouldShowAuthAlert = false
     @Published var currentUser: User?
+    
+    var onSignInSuccess: (() -> Void)?
+    var onSignOutSuccess: (() -> Void)?
+    var onSignOutStart: (() -> Void)?
+    var onSignOutAnimationComplete: (() -> Void)?
+    var onClosePopup: (() -> Void)?
     
     private let defaults = UserDefaults.standard
     private let apiService = APIService.shared
@@ -38,6 +43,7 @@ class AuthenticationService: ObservableObject {
                 let userData = try await apiService.getCurrentUser()
                 self.currentUser = userData
                 self.isAuthenticated = true
+                onSignInSuccess?()
                 print("會話恢復成功")
             } catch {
                 print("恢復會話失敗：\(error)")
@@ -51,6 +57,7 @@ class AuthenticationService: ObservableObject {
                 let userData = try await apiService.getCurrentUser()
                 self.currentUser = userData
                 self.isAuthenticated = true
+                onSignInSuccess?()
                 print("Token 刷新成功")
             } catch {
                 print("Token 刷新失敗：\(error)")
@@ -111,12 +118,11 @@ class AuthenticationService: ObservableObject {
             // 5. 更新本地狀態
             await MainActor.run {
                 print("正在更新本地狀態...")
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                    self.currentUser = userData
-                    self.isAuthenticated = true
-                }
+                self.currentUser = userData
                 defaults.isLoggedIn = true
                 defaults.lastLoginDate = Date()
+                self.isAuthenticated = true
+                onSignInSuccess?()
                 self.error = nil
                 print("登入流程完成")
             }
@@ -177,12 +183,29 @@ class AuthenticationService: ObservableObject {
     
     func signOut() {
         print("開始登出流程...")
+        // 先關閉彈出視窗
+        onClosePopup?()
+        
+        // 立即執行登出動畫
+        onSignOutStart?()
+    }
+    
+    func performSignOut() {
+        print("執行登出操作...")
         GIDSignIn.sharedInstance.signOut()
         tokenManager.clearTokens()
         defaults.clearAuthData()
         isAuthenticated = false
         currentUser = nil
+        
+        // 確保登出狀態正確更新
+        onSignOutSuccess?()
         print("登出完成")
+    }
+    
+    func handleSignOutAnimationComplete() {
+        print("登出動畫完成，執行實際登出...")
+        performSignOut()
     }
     
     func validateSession() async throws {
@@ -228,6 +251,7 @@ class AuthenticationService: ObservableObject {
         currentUser = nil
         error = nil
         shouldShowAuthAlert = false
+        onSignOutSuccess?()
         print("靜默登出完成")
     }
     
