@@ -244,6 +244,8 @@
 "auth.error.unknown" = "發生未預期的錯誤，請重試";
 "auth.error.token_missing" = "登入憑證無效，請重新登入";
 "auth.error.token_expired" = "登入階段已過期，請重新登入";
+"auth.error.token_refresh_failed" = "更新登入狀態失敗，請重新登入";
+"auth.error.token_invalid" = "登入憑證無效，請重新登入";
 "auth.error.canceled" = "已取消登入";
 "auth.error.invalid_token" = "驗證令牌無效，請重試";
 "auth.error.decoding" = "處理用戶資料時發生錯誤，請重試";
@@ -255,18 +257,20 @@
 "auth.error.scope_not_granted" = "未授予必要的權限";
 "auth.error.server" = "伺服器錯誤，請稍後再試";
 "auth.error.sign_in_in_progress" = "登入程序正在進行中";
-"auth.session_expired.title" = "登入階段已過期";
-"auth.session_expired.message" = "您的登入階段已過期，請重新登入";
-"auth.error.network" = "網路錯誤，請稍後再試";
+"auth.error.network" = "網路錯誤，請檢查網路連接後重試";
+"auth.error.session_expired" = "登入階段已過期，請重新登入";
 
 // Authentication Messages
-"auth.error.profile_fetch" = "無法取得使用者資料";
-"auth.error.session_expired" = "您的登入階段已過期";
+"auth.message.token_refresh" = "正在更新登入狀態...";
+"auth.message.token_refreshed" = "登入狀態已更新";
 "auth.message.logging_in" = "登入中...";
 "auth.message.restoring_session" = "正在恢復登入狀態...";
 "auth.message.session_restored" = "已成功恢復登入狀態";
 "auth.message.logged_out" = "已成功登出";
 "auth.message.token_updated" = "已更新驗證令牌";
+
+// Authentication Alerts
+"auth.alert.session_expired.title" = "登入階段已過期";
 
 // User Profile
 "profile.default.name" = "訪客";

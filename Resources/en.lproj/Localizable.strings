@@ -236,8 +236,9 @@
 "auth.error.google_signin" = "Failed to sign in with Google. Please try again.";
 "auth.error.unknown" = "An unexpected error occurred. Please try again.";
 "auth.error.token_missing" = "Login credentials are invalid. Please sign in again.";
-"auth.error.token_expired" = "Your login session has expired. Please sign in again.";
-"auth.error.network" = "Network connection error. Please check your internet connection.";
+"auth.error.token_expired" = "Your session has expired. Please sign in again.";
+"auth.error.token_refresh_failed" = "Failed to refresh login status. Please sign in again.";
+"auth.error.token_invalid" = "Invalid login credentials. Please sign in again.";
 "auth.error.canceled" = "Sign in was canceled.";
 "auth.error.invalid_token" = "Invalid authentication token. Please try again.";
 "auth.error.decoding" = "Error processing user data. Please try again.";
@@ -249,26 +250,19 @@
 "auth.error.scope_not_granted" = "Required permissions not granted.";
 "auth.error.server" = "Server error. Please try again later.";
 "auth.error.sign_in_in_progress" = "Sign in is already in progress.";
-"auth.session_expired.title" = "Session Expired";
-"auth.session_expired.message" = "Your login session has expired. Please sign in again.";
 "auth.error.network" = "Network error. Please check your internet connection.";
 
 // Authentication Messages
-"auth.error.profile_fetch" = "Failed to fetch user profile";
-"auth.error.session_expired" = "Your session has expired";
+"auth.message.token_refresh" = "Updating login status...";
+"auth.message.token_refreshed" = "Login status updated";
 "auth.message.logging_in" = "Signing in...";
 "auth.message.restoring_session" = "Restoring session...";
 "auth.message.session_restored" = "Session restored successfully";
 "auth.message.logged_out" = "Signed out successfully";
 "auth.message.token_updated" = "Authentication token updated";
 
-// User Profile
-"profile.default.name" = "Guest";
-"profile.default.email" = "Not signed in";
-"profile.default.bio" = "No bio available";
-"profile.image.dimension" = "200";
-"profile.status.active" = "Active";
-"profile.status.inactive" = "Inactive";
+// Authentication Alerts
+"auth.alert.session_expired.title" = "Session Expired";
 
 // Debug Messages
 "debug.error.top_vc_missing" = "Could not get top view controller";
@@ -277,7 +271,7 @@
 "debug.success.user_data" = "Successfully created user data";
 "debug.success.decode" = "Successfully decoded user data";
 "debug.error.decode" = "Error decoding user data";
-"debug.success.signin" = "Successfully completed Google Sign In process";
+"debug.success.signin" = "Google Sign In process completed successfully";
 "debug.error.signin" = "Google Sign In Error";
 
 // Validation Messages
@@ -285,6 +279,41 @@
 "validation.token.invalid" = "Authentication token is invalid";
 "validation.token.expired" = "Authentication token has expired";
 "validation.session.invalid" = "Invalid session";
+
+// Token Status Messages
+"token.status.checking" = "Checking token status...";
+"token.status.valid" = "Token is valid";
+"token.status.needs_refresh" = "Token needs refresh";
+"token.status.needs_reauth" = "Re-authentication required";
+"token.status.refreshing" = "Refreshing token...";
+"token.status.refreshed" = "Token refreshed successfully";
+"token.status.cleared" = "Tokens cleared";
+
+// Token Error Messages
+"token.error.save_failed" = "Failed to save tokens";
+"token.error.load_failed" = "Failed to load tokens";
+"token.error.refresh_failed" = "Failed to refresh token";
+"token.error.invalid" = "Invalid token";
+"token.error.expired" = "Token has expired";
+"token.error.not_found" = "Token not found";
+"token.error.keychain" = "Keychain access error";
+
+// Session Messages
+"session.restoring" = "Restoring user session...";
+"session.restored" = "Session restored successfully";
+"session.restore_failed" = "Failed to restore session";
+"session.expired" = "Session has expired";
+"session.invalid" = "Invalid session";
+"session.checking" = "Checking session status...";
+
+// Network Messages
+"network.error.connection" = "Network connection error";
+"network.error.timeout" = "Network request timed out";
+"network.error.server" = "Server communication error";
+"network.error.invalid_response" = "Invalid server response";
+"network.status.connecting" = "Connecting to server...";
+"network.status.connected" = "Connected to server";
+"network.status.disconnected" = "Disconnected from server";
 
 // Welcome Messages
 "welcome.message.success" = "Successfully signed in!";

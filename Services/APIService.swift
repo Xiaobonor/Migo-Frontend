@@ -22,6 +22,7 @@ struct APIConfig {
 enum APIEndpoint {
     case googleSignIn
     case me
+    case refresh
     
     var path: String {
         switch self {
@@ -29,6 +30,8 @@ enum APIEndpoint {
             return "/auth/google/signin"
         case .me:
             return "/auth/me"
+        case .refresh:
+            return "/auth/refresh"
         }
     }
 }
@@ -67,6 +70,8 @@ enum APIError: Error {
 class APIService {
     static let shared = APIService()
     private let jsonDecoder: JSONDecoder
+    private let tokenManager = TokenManager.shared
+    private let retryLimit = 3
     
     init() {
         jsonDecoder = JSONDecoder()
@@ -107,27 +112,48 @@ class APIService {
         jsonDecoder.keyDecodingStrategy = .useDefaultKeys
     }
     
-    // 通用請求方法
-    private func request<T: Decodable>(_ endpoint: APIEndpoint, method: String = "GET", body: Data? = nil) async throws -> T {
+    // MARK: - 請求方法
+    private func request<T: Decodable>(_ endpoint: APIEndpoint, method: String = "GET", body: Data? = nil, retryCount: Int = 0) async throws -> T {
+        // 檢查 token 狀態
+        if endpoint != .googleSignIn && endpoint != .refresh {
+            switch tokenManager.checkTokenStatus() {
+            case .needsRefresh:
+                // 嘗試刷新 token
+                _ = try await refreshToken()
+            case .needsReauth:
+                throw APIError.authenticationError
+            default:
+                break
+            }
+        }
+        
         guard let url = URL(string: "\(APIConfig.baseURL)\(endpoint.path)") else {
             throw APIError.invalidURL
         }
         
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        // 創建 URLRequest
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        // 添加 Authorization Header
-        if let token = UserDefaults.standard.string(forKey: "accessToken") {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        // 根據不同端點添加不同的 token
+        if endpoint == .refresh {
+            if let refreshToken = tokenManager.getToken(.refresh) {
+                urlRequest.setValue("Bearer \(refreshToken)", forHTTPHeaderField: "Authorization")
+            }
+        } else if endpoint != .googleSignIn {
+            if let accessToken = tokenManager.getToken(.access) {
+                urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
         }
         
         if let body = body {
-            request.httpBody = body
+            urlRequest.httpBody = body
         }
         
+        let session = URLSession.shared
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, response) = try await session.data(for: urlRequest)
             
             // 打印響應數據（僅用於調試）
             if let jsonString = String(data: data, encoding: .utf8) {
@@ -163,6 +189,11 @@ class APIService {
                     throw APIError.decodingError
                 }
             case 401:
+                if retryCount < retryLimit && endpoint != .refresh {
+                    // 嘗試刷新 token 並重試請求
+                    _ = try await refreshToken()
+                    return try await request(endpoint, method: method, body: body, retryCount: retryCount + 1)
+                }
                 throw APIError.authenticationError
             default:
                 let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
@@ -175,15 +206,30 @@ class APIService {
         }
     }
     
-    // 獲取當前用戶資料
-    func getCurrentUser() async throws -> User {
-        return try await request(.me)
+    // MARK: - Token 刷新
+    func refreshToken() async throws -> TokenResponse {
+        print("開始刷新 token...")
+        do {
+            let response: TokenResponse = try await request(.refresh, method: "POST")
+            tokenManager.saveTokens(response)
+            print("Token 刷新成功")
+            return response
+        } catch {
+            print("Token 刷新失敗：\(error)")
+            throw APIError.authenticationError
+        }
     }
     
-    // 處理 Google 登入
-    func handleGoogleSignIn(idToken: String) async throws -> AuthResponse {
+    // MARK: - API 方法
+    func handleGoogleSignIn(idToken: String) async throws -> TokenResponse {
         let body = try JSONEncoder().encode(["id_token": idToken])
-        return try await request(.googleSignIn, method: "POST", body: body)
+        let response: TokenResponse = try await request(.googleSignIn, method: "POST", body: body)
+        tokenManager.saveTokens(response)
+        return response
+    }
+    
+    func getCurrentUser() async throws -> User {
+        return try await request(.me)
     }
 }
 

@@ -1,6 +1,7 @@
 import Foundation
 import GoogleSignIn
 import GoogleSignInSwift
+import SwiftUI
 
 class AuthenticationService: ObservableObject {
     static let shared = AuthenticationService()
@@ -13,6 +14,7 @@ class AuthenticationService: ObservableObject {
     
     private let defaults = UserDefaults.standard
     private let apiService = APIService.shared
+    private let tokenManager = TokenManager.shared
     
     init() {
         // 配置 Google Sign In
@@ -28,58 +30,38 @@ class AuthenticationService: ObservableObject {
     private func restoreUserSession() async {
         print("開始恢復用戶會話...")
         
-        // 檢查是否有已保存的登入狀態
-        guard defaults.isLoggedIn else {
-            print("未找到已保存的登入狀態，跳過恢復")
-            return
-        }
-        
-        isLoading = true
-        defer { 
-            isLoading = false
-            print("會話恢復流程結束")
-        }
-        
-        print("正在恢復會話...")
-        
-        do {
-            // 1. 檢查是否有保存的 access token
-            guard let accessToken = defaults.string(forKey: "accessToken") else {
-                print("錯誤：未找到保存的 access token")
-                throw APIError.noToken
-            }
-            print("成功獲取保存的 access token")
-            
-            // 2. 使用 access token 嘗試獲取用戶資料
-            print("正在使用 access token 獲取用戶資料...")
-            let userData = try await APIService.shared.getCurrentUser()
-            print("成功獲取用戶資料")
-            
-            // 3. 如果成功獲取用戶資料，更新本地狀態
-            await MainActor.run {
-                print("正在更新本地狀態...")
+        // 檢查 token 狀態
+        switch tokenManager.checkTokenStatus() {
+        case .valid:
+            print("Token 有效，正在恢復會話...")
+            do {
+                let userData = try await apiService.getCurrentUser()
                 self.currentUser = userData
                 self.isAuthenticated = true
                 print("會話恢復成功")
+            } catch {
+                print("恢復會話失敗：\(error)")
+                // 直接清除資料並設為未登入
+                silentLogout()
             }
             
-        } catch APIError.authenticationError {
-            print("認證錯誤：token 可能已過期或無效")
-            await forceLogout(reason: "auth.error.session_expired")
-        } catch APIError.networkError(let error) {
-            print("網路錯誤：\(error.localizedDescription)")
-            print("錯誤詳情：\(error)")
-            self.error = NSLocalizedString("auth.error.network", comment: "")
-        } catch {
-            print("未預期的錯誤：\(error)")
-            print("錯誤類型：\(type(of: error))")
-            if let nsError = error as NSError? {
-                print("Domain: \(nsError.domain)")
-                print("Code: \(nsError.code)")
-                print("Description: \(nsError.localizedDescription)")
-                print("User Info: \(nsError.userInfo)")
+        case .needsRefresh:
+            print("Token 需要刷新，正在嘗試刷新...")
+            do {
+                let userData = try await apiService.getCurrentUser()
+                self.currentUser = userData
+                self.isAuthenticated = true
+                print("Token 刷新成功")
+            } catch {
+                print("Token 刷新失敗：\(error)")
+                // 直接清除資料並設為未登入
+                silentLogout()
             }
-            await forceLogout(reason: "auth.error.session_expired")
+            
+        case .needsReauth:
+            print("需要重新認證")
+            // 直接清除資料並設為未登入
+            silentLogout()
         }
     }
     
@@ -118,28 +100,23 @@ class AuthenticationService: ObservableObject {
             
             // 3. 與後端進行驗證
             print("正在與後端進行驗證...")
-            let authResponse = try await APIService.shared.handleGoogleSignIn(idToken: idToken)
+            let tokenResponse = try await apiService.handleGoogleSignIn(idToken: idToken)
             print("後端驗證成功")
             
-            // 4. 保存後端返回的 access token
-            await MainActor.run {
-                print("正在保存 access token...")
-                defaults.set(authResponse.accessToken, forKey: "accessToken")
-                print("Access token 已保存")
-            }
-            
-            // 5. 使用 access token 獲取用戶資料
+            // 4. 使用 access token 獲取用戶資料
             print("正在獲取用戶詳細資料...")
-            let userData = try await APIService.shared.getCurrentUser()
+            let userData = try await apiService.getCurrentUser()
             print("成功獲取用戶詳細資料")
             
-            // 6. 更新本地狀態
+            // 5. 更新本地狀態
             await MainActor.run {
                 print("正在更新本地狀態...")
-                self.currentUser = userData
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    self.currentUser = userData
+                    self.isAuthenticated = true
+                }
                 defaults.isLoggedIn = true
                 defaults.lastLoginDate = Date()
-                self.isAuthenticated = true
                 self.error = nil
                 print("登入流程完成")
             }
@@ -201,28 +178,57 @@ class AuthenticationService: ObservableObject {
     func signOut() {
         print("開始登出流程...")
         GIDSignIn.sharedInstance.signOut()
+        tokenManager.clearTokens()
         defaults.clearAuthData()
         isAuthenticated = false
         currentUser = nil
         print("登出完成")
     }
     
-    func validateSession() async {
+    func validateSession() async throws {
         print("開始驗證會話...")
-        guard let token = defaults.string(forKey: "accessToken") else {
-            print("錯誤：未找到 access token")
-            await forceLogout(reason: "auth.error.token_missing")
-            return
-        }
         
-        do {
-            print("正在驗證 token...")
-            _ = try await APIService.shared.getCurrentUser()
-            print("token 驗證成功")
-        } catch {
-            print("token 驗證失敗：\(error)")
-            await forceLogout(reason: "auth.error.token_expired")
+        // 檢查 token 狀態
+        switch tokenManager.checkTokenStatus() {
+        case .valid:
+            print("Token 有效，正在驗證...")
+            try await apiService.getCurrentUser()
+            print("Token 驗證成功")
+            
+        case .needsRefresh:
+            print("Token 需要刷新，正在嘗試刷新...")
+            do {
+                _ = try await apiService.refreshToken()
+                try await apiService.getCurrentUser()
+                print("Token 刷新並驗證成功")
+            } catch {
+                print("Token 刷新失敗：\(error)")
+                await MainActor.run {
+                    silentLogout()
+                }
+                throw APIError.authenticationError
+            }
+            
+        case .needsReauth:
+            print("Token 需要重新認證")
+            await MainActor.run {
+                silentLogout()
+            }
+            throw APIError.authenticationError
         }
+    }
+    
+    @MainActor
+    private func silentLogout() {
+        print("靜默登出...")
+        GIDSignIn.sharedInstance.signOut()
+        tokenManager.clearTokens()
+        defaults.clearAuthData()
+        isAuthenticated = false
+        currentUser = nil
+        error = nil
+        shouldShowAuthAlert = false
+        print("靜默登出完成")
     }
     
     @MainActor
@@ -230,31 +236,6 @@ class AuthenticationService: ObservableObject {
         signOut()
         shouldShowAuthAlert = true
         error = NSLocalizedString(reason, comment: "Auth error")
-    }
-    
-    @MainActor
-    private func fetchUserProfile() async {
-        do {
-            // 嘗試獲取已登入的 Google 用戶
-            if let currentUser = try? await GIDSignIn.sharedInstance.currentUser {
-                let userData = """
-                {
-                    "_id": "\(currentUser.userID ?? "")",
-                    "email": "\(currentUser.profile?.email ?? "")",
-                    "name": "\(currentUser.profile?.name ?? "")",
-                    "picture": "\(currentUser.profile?.imageURL(withDimension: 200)?.absoluteString ?? "")",
-                    "nickname": "\(currentUser.profile?.givenName ?? "")"
-                }
-                """.data(using: .utf8)!
-                
-                let decoder = JSONDecoder()
-                self.currentUser = try decoder.decode(User.self, from: userData)
-            } else {
-                throw AuthError.invalidToken
-            }
-        } catch {
-            self.error = NSLocalizedString("auth.error.profile_fetch", comment: "Failed to fetch user profile")
-        }
     }
 }
 
