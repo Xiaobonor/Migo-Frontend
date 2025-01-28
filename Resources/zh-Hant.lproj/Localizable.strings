@@ -257,6 +257,7 @@
 "auth.error.sign_in_in_progress" = "登入程序正在進行中";
 "auth.session_expired.title" = "登入階段已過期";
 "auth.session_expired.message" = "您的登入階段已過期，請重新登入";
+"auth.error.network" = "網路錯誤，請稍後再試";
 
 // Authentication Messages
 "auth.error.profile_fetch" = "無法取得使用者資料";

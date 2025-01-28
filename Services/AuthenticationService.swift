@@ -26,57 +26,73 @@ class AuthenticationService: ObservableObject {
     
     @MainActor
     private func restoreUserSession() async {
+        print("開始恢復用戶會話...")
+        
         // 檢查是否有已保存的登入狀態
-        if defaults.isLoggedIn {
-            isLoading = true
-            defer { isLoading = false }
-            
-            print(NSLocalizedString("auth.message.restoring_session", comment: ""))
-            
-            do {
-                // 嘗試恢復 Google Sign In 狀態
-                let googleUser = try await GIDSignIn.sharedInstance.restorePreviousSignIn()
-                
-                // 驗證 ID Token
-                guard let idToken = googleUser.idToken?.tokenString else {
-                    throw AuthError.invalidToken
-                }
-                
-                print(NSLocalizedString("auth.message.token_updated", comment: ""))
-                
-                // 更新 token
-                defaults.authToken = idToken
-                
-                // 更新用戶資料
-                let userData = """
-                {
-                    "_id": "\(googleUser.userID ?? "")",
-                    "email": "\(googleUser.profile?.email ?? NSLocalizedString("profile.default.email", comment: ""))",
-                    "name": "\(googleUser.profile?.name ?? NSLocalizedString("profile.default.name", comment: ""))",
-                    "picture": "\(googleUser.profile?.imageURL(withDimension: 200)?.absoluteString ?? "")",
-                    "nickname": "\(googleUser.profile?.givenName ?? "")"
-                }
-                """.data(using: .utf8)!
-                
-                let decoder = JSONDecoder()
-                currentUser = try decoder.decode(User.self, from: userData)
-                isAuthenticated = true
-                
-                print(NSLocalizedString("auth.message.session_restored", comment: ""))
-                
-            } catch {
-                // 如果恢復過程出錯，清除本地存儲
-                await forceLogout(reason: "auth.error.session_expired")
+        guard defaults.isLoggedIn else {
+            print("未找到已保存的登入狀態，跳過恢復")
+            return
+        }
+        
+        isLoading = true
+        defer { 
+            isLoading = false
+            print("會話恢復流程結束")
+        }
+        
+        print("正在恢復會話...")
+        
+        do {
+            // 1. 檢查是否有保存的 access token
+            guard let accessToken = defaults.string(forKey: "accessToken") else {
+                print("錯誤：未找到保存的 access token")
+                throw APIError.noToken
             }
+            print("成功獲取保存的 access token")
+            
+            // 2. 使用 access token 嘗試獲取用戶資料
+            print("正在使用 access token 獲取用戶資料...")
+            let userData = try await APIService.shared.getCurrentUser()
+            print("成功獲取用戶資料")
+            
+            // 3. 如果成功獲取用戶資料，更新本地狀態
+            await MainActor.run {
+                print("正在更新本地狀態...")
+                self.currentUser = userData
+                self.isAuthenticated = true
+                print("會話恢復成功")
+            }
+            
+        } catch APIError.authenticationError {
+            print("認證錯誤：token 可能已過期或無效")
+            await forceLogout(reason: "auth.error.session_expired")
+        } catch APIError.networkError(let error) {
+            print("網路錯誤：\(error.localizedDescription)")
+            print("錯誤詳情：\(error)")
+            self.error = NSLocalizedString("auth.error.network", comment: "")
+        } catch {
+            print("未預期的錯誤：\(error)")
+            print("錯誤類型：\(type(of: error))")
+            if let nsError = error as NSError? {
+                print("Domain: \(nsError.domain)")
+                print("Code: \(nsError.code)")
+                print("Description: \(nsError.localizedDescription)")
+                print("User Info: \(nsError.userInfo)")
+            }
+            await forceLogout(reason: "auth.error.session_expired")
         }
     }
     
     func signInWithGoogle() async {
+        print("開始 Google 登入流程...")
         isLoading = true
-        defer { isLoading = false }
+        defer { 
+            isLoading = false
+            print("Google 登入流程結束")
+        }
         
         guard let topVC = await UIApplication.shared.topViewController() else {
-            print(NSLocalizedString("debug.error.top_vc_missing", comment: ""))
+            print("錯誤：無法獲取頂層視圖控制器")
             await MainActor.run {
                 self.error = NSLocalizedString("auth.error.internal", comment: "")
             }
@@ -84,81 +100,98 @@ class AuthenticationService: ObservableObject {
         }
         
         do {
-            print(NSLocalizedString("auth.message.logging_in", comment: ""))
+            print("正在初始化 Google 登入...")
             
+            // 1. Google 登入
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: topVC)
             let googleUser = result.user
+            print("Google 登入成功")
+            print("用戶 ID: \(googleUser.userID ?? "未知")")
+            print("用戶郵箱: \(googleUser.profile?.email ?? "未知")")
             
-            // 驗證 ID Token
+            // 2. 獲取 ID Token
             guard let idToken = googleUser.idToken?.tokenString else {
-                print(NSLocalizedString("debug.error.no_id_token", comment: ""))
-                throw AuthError.invalidToken
+                print("錯誤：無法獲取 ID Token")
+                throw AuthError.noIDToken
             }
+            print("成功獲取 ID Token")
             
-            print(NSLocalizedString("debug.success.id_token", comment: ""))
+            // 3. 與後端進行驗證
+            print("正在與後端進行驗證...")
+            let authResponse = try await APIService.shared.handleGoogleSignIn(idToken: idToken)
+            print("後端驗證成功")
             
-            // 從 Google 用戶資料創建用戶
-            let userData = """
-            {
-                "_id": "\(googleUser.userID ?? "")",
-                "email": "\(googleUser.profile?.email ?? NSLocalizedString("profile.default.email", comment: ""))",
-                "name": "\(googleUser.profile?.name ?? NSLocalizedString("profile.default.name", comment: ""))",
-                "picture": "\(googleUser.profile?.imageURL(withDimension: 200)?.absoluteString ?? "")",
-                "nickname": "\(googleUser.profile?.givenName ?? "")"
-            }
-            """.data(using: .utf8)!
-            
-            print(NSLocalizedString("debug.success.user_data", comment: ""))
-            
-            let decoder = JSONDecoder()
-            do {
-                currentUser = try decoder.decode(User.self, from: userData)
-                print(NSLocalizedString("debug.success.decode", comment: ""))
-            } catch {
-                print("\(NSLocalizedString("debug.error.decode", comment: "")): \(error)")
-                throw AuthError.decodingError
-            }
-            
-            // 存儲登入狀態和 token
+            // 4. 保存後端返回的 access token
             await MainActor.run {
+                print("正在保存 access token...")
+                defaults.set(authResponse.accessToken, forKey: "accessToken")
+                print("Access token 已保存")
+            }
+            
+            // 5. 使用 access token 獲取用戶資料
+            print("正在獲取用戶詳細資料...")
+            let userData = try await APIService.shared.getCurrentUser()
+            print("成功獲取用戶詳細資料")
+            
+            // 6. 更新本地狀態
+            await MainActor.run {
+                print("正在更新本地狀態...")
+                self.currentUser = userData
                 defaults.isLoggedIn = true
-                defaults.authToken = idToken
                 defaults.lastLoginDate = Date()
                 self.isAuthenticated = true
                 self.error = nil
+                print("登入流程完成")
             }
             
-            print(NSLocalizedString("debug.success.signin", comment: ""))
-            
         } catch let error as GIDSignInError {
-            print("\(NSLocalizedString("debug.error.signin", comment: "")): \(error.localizedDescription)")
-            print("Error code: \(error.code)")
+            print("Google 登入錯誤：\(error.localizedDescription)")
+            print("錯誤代碼：\(error.code.rawValue)")
+            print("錯誤詳情：\(error)")
             await MainActor.run {
                 switch error.code {
                 case .canceled:
+                    print("用戶取消登入")
                     self.error = NSLocalizedString("auth.error.canceled", comment: "")
                 case .EMM:
+                    print("企業管理錯誤")
                     self.error = NSLocalizedString("auth.error.enterprise", comment: "")
                 case .hasNoAuthInKeychain:
+                    print("Keychain 中無認證信息")
                     self.error = NSLocalizedString("auth.error.no_saved_auth", comment: "")
                 case .unknown:
+                    print("未知 Google 登入錯誤")
                     self.error = NSLocalizedString("auth.error.unknown", comment: "")
                 @unknown default:
+                    print("其他 Google 登入錯誤")
                     self.error = NSLocalizedString("auth.error.google_signin", comment: "")
                 }
             }
-        } catch AuthError.invalidToken {
-            print(NSLocalizedString("validation.token.invalid", comment: ""))
+        } catch APIError.authenticationError {
+            print("後端認證錯誤")
             await MainActor.run {
                 self.error = NSLocalizedString("auth.error.invalid_token", comment: "")
             }
-        } catch AuthError.decodingError {
-            print(NSLocalizedString("debug.error.decode", comment: ""))
+        } catch APIError.networkError(let error) {
+            print("網路錯誤：\(error.localizedDescription)")
+            print("錯誤詳情：\(error)")
             await MainActor.run {
-                self.error = NSLocalizedString("auth.error.decoding", comment: "")
+                self.error = NSLocalizedString("auth.error.network", comment: "")
+            }
+        } catch APIError.serverError(let message) {
+            print("伺服器錯誤：\(message)")
+            await MainActor.run {
+                self.error = message
             }
         } catch {
-            print("\(NSLocalizedString("auth.error.unknown", comment: "")): \(error)")
+            print("未預期的錯誤：\(error)")
+            print("錯誤類型：\(type(of: error))")
+            if let nsError = error as NSError? {
+                print("Domain: \(nsError.domain)")
+                print("Code: \(nsError.code)")
+                print("Description: \(nsError.localizedDescription)")
+                print("User Info: \(nsError.userInfo)")
+            }
             await MainActor.run {
                 self.error = NSLocalizedString("auth.error.unknown", comment: "")
             }
@@ -166,28 +199,29 @@ class AuthenticationService: ObservableObject {
     }
     
     func signOut() {
+        print("開始登出流程...")
         GIDSignIn.sharedInstance.signOut()
         defaults.clearAuthData()
         isAuthenticated = false
         currentUser = nil
-        print(NSLocalizedString("auth.message.logged_out", comment: ""))
+        print("登出完成")
     }
     
-    func validateSession() {
-        Task {
-            // 檢查 token 是否存在且有效
-            guard let token = defaults.authToken else {
-                await forceLogout(reason: "auth.error.token_missing")
-                return
-            }
-            
-            // 這裡可以添加與後端的 token 驗證
-            // let isValid = await validateTokenWithBackend(token)
-            let isValid = true // 臨時模擬 token 驗證
-            
-            if !isValid {
-                await forceLogout(reason: "auth.error.token_expired")
-            }
+    func validateSession() async {
+        print("開始驗證會話...")
+        guard let token = defaults.string(forKey: "accessToken") else {
+            print("錯誤：未找到 access token")
+            await forceLogout(reason: "auth.error.token_missing")
+            return
+        }
+        
+        do {
+            print("正在驗證 token...")
+            _ = try await APIService.shared.getCurrentUser()
+            print("token 驗證成功")
+        } catch {
+            print("token 驗證失敗：\(error)")
+            await forceLogout(reason: "auth.error.token_expired")
         }
     }
     
@@ -229,6 +263,7 @@ enum AuthError: Error {
     case networkError
     case decodingError
     case unknown
+    case noIDToken
 }
 
 // MARK: - UIApplication Extension

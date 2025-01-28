@@ -251,6 +251,7 @@
 "auth.error.sign_in_in_progress" = "Sign in is already in progress.";
 "auth.session_expired.title" = "Session Expired";
 "auth.session_expired.message" = "Your login session has expired. Please sign in again.";
+"auth.error.network" = "Network error. Please check your internet connection.";
 
 // Authentication Messages
 "auth.error.profile_fetch" = "Failed to fetch user profile";

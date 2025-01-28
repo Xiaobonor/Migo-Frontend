@@ -127,7 +127,7 @@ struct SettingsView: View {
     private var profileSection: some View {
         VStack {
             if let user = authService.currentUser {
-                AsyncImage(url: URL(string: user.picture ?? "")) { image in
+                AsyncImage(url: user.picture) { image in
                     image
                         .resizable()
                         .scaledToFit()

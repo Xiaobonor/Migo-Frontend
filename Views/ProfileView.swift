@@ -36,7 +36,7 @@ private struct ProfileHeader: View {
         VStack(spacing: 15) {
             // User Avatar
             if let user = authService.currentUser {
-                AsyncImage(url: URL(string: user.picture ?? "")) { image in
+                AsyncImage(url: user.picture) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fit)
