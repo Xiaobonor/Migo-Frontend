@@ -19,20 +19,25 @@ struct APIConfig {
 }
 
 // MARK: - API Endpoints
-enum APIEndpoint {
-    case googleSignIn
-    case me
-    case refresh
+struct APIEndpoint: Equatable {
+    let path: String
     
-    var path: String {
-        switch self {
-        case .googleSignIn:
-            return "/auth/google/signin"
-        case .me:
-            return "/auth/me"
-        case .refresh:
-            return "/auth/refresh"
-        }
+    init(path: String) {
+        self.path = path
+    }
+    
+    var url: URL? {
+        URL(string: "\(APIConfig.baseURL)\(path)")
+    }
+    
+    // 基本端點
+    static let googleSignIn = APIEndpoint(path: "/auth/google/signin")
+    static let me = APIEndpoint(path: "/auth/me")
+    static let refresh = APIEndpoint(path: "/auth/refresh")
+    
+    // 實現 Equatable 協議
+    static func == (lhs: APIEndpoint, rhs: APIEndpoint) -> Bool {
+        return lhs.path == rhs.path
     }
 }
 
@@ -127,7 +132,7 @@ class APIService {
             }
         }
         
-        guard let url = URL(string: "\(APIConfig.baseURL)\(endpoint.path)") else {
+        guard let url = endpoint.url else {
             throw APIError.invalidURL
         }
         
@@ -230,6 +235,54 @@ class APIService {
     
     func getCurrentUser() async throws -> User {
         return try await request(.me)
+    }
+    
+    func makeRequest<T: Decodable>(_ endpoint: APIEndpoint,
+                                  method: String = "GET",
+                                  body: Data? = nil) async throws -> T {
+        guard let url = endpoint.url else {
+            throw APIError.invalidURL
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // 添加認證 token
+        if endpoint != .googleSignIn && endpoint != .refresh {
+            if let accessToken = tokenManager.getToken(.access) {
+                urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
+        } else if endpoint == .refresh {
+            if let refreshToken = tokenManager.getToken(.refresh) {
+                urlRequest.setValue("Bearer \(refreshToken)", forHTTPHeaderField: "Authorization")
+            }
+        }
+        
+        if let body = body {
+            urlRequest.httpBody = body
+        }
+        
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        
+        switch httpResponse.statusCode {
+        case 200...299:
+            do {
+                return try jsonDecoder.decode(T.self, from: data)
+            } catch {
+                print("解碼錯誤：\(error)")
+                throw APIError.decodingError
+            }
+        case 401:
+            throw APIError.authenticationError
+        default:
+            let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data)
+            throw APIError.serverError(errorResponse?.detail ?? "未知錯誤")
+        }
     }
 }
 

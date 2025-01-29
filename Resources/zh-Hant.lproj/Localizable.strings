@@ -73,6 +73,30 @@
 "diary.tag.study" = "學習";
 "diary.tag.reflection" = "反思";
 "diary.title_placeholder" = "輸入標題";
+"diary.content_placeholder" = "寫下你的想法...";
+"diary.quick_notes" = "隨手記";
+"diary.quick_notes.empty" = "還沒有隨手記";
+"diary.entries" = "日記";
+"diary.entries.empty" = "還沒有日記";
+"diary.new" = "新增日記";
+"diary.delete.title" = "刪除日記";
+"diary.delete.message" = "確定要刪除這篇日記嗎？此操作無法復原。";
+
+// Diary Components
+"diary.mood.title" = "心情";
+"diary.tags.title" = "標籤";
+"diary.tags.add" = "新增標籤";
+"diary.tags.suggestions" = "推薦標籤";
+"diary.media.title" = "媒體";
+"diary.media.empty" = "點擊添加圖片";
+
+// Quick Note
+"diary.note.text" = "文字";
+"diary.note.voice" = "語音";
+"diary.note.drawing" = "繪圖";
+"diary.note.placeholder" = "快速記錄...";
+"diary.note.recording" = "正在錄音...";
+"diary.note.tap_record" = "點擊開始錄音";
 
 // Group View
 "group.title" = "小組";
@@ -226,6 +250,7 @@
 "common.create" = "創建";
 "common.ok" = "確定";
 "common.close" = "關閉";
+"common.add" = "新增";
 
 // Language Names
 "language.zh_hant" = "繁體中文";
@@ -311,4 +336,36 @@
 // Loading View
 "loading.message" = "正在載入...";
 "loading.checking_auth" = "正在檢查登入狀態";
-"loading.preparing" = "正在準備應用程式"; 
+"loading.preparing" = "正在準備應用程式";
+
+// Error Messages
+"error.title" = "錯誤";
+"error.unknown" = "發生未知錯誤";
+"error.save_failed" = "儲存失敗";
+"error.delete_failed" = "刪除失敗";
+"error.load_failed" = "載入失敗";
+"error.network" = "網路連接錯誤";
+"error.server" = "伺服器錯誤";
+
+// Location
+"location.permission.title" = "位置權限";
+"location.permission.message" = "需要位置權限來記錄你的位置";
+"location.unknown" = "未知位置";
+"location.updating" = "正在更新位置...";
+
+// Media
+"media.permission.title" = "媒體權限";
+"media.permission.message" = "需要媒體權限來添加圖片";
+"media.processing" = "正在處理...";
+"media.upload.failed" = "上傳失敗";
+
+// Stats
+"stats.title" = "統計";
+"stats.today" = "今天";
+"stats.week" = "本週";
+"stats.month" = "本月";
+"stats.total_entries" = "總條目";
+"stats.writing_time" = "寫作時間";
+"stats.avg_length" = "平均長度";
+"stats.top_emotions" = "常見心情";
+"stats.top_tags" = "常用標籤"; 
